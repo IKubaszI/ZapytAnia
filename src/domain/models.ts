@@ -1,12 +1,13 @@
+// src/domain/models.ts
 export type Card = {
   id: string;
-  front: string; // np. "house"
-  back: string;  // np. "dom"
+  front: string;
+  back: string;
   deckId: string;
-  nextReviewAt: number; // kiedy pojawi się w SRS
-  ease: number;         // współczynnik „łatwości” 1.3–2.5
-  interval: number;     // ile dni do następnej powtórki
-  repetitions: number;  // ile poprawnych powtórek z rzędu
+  nextReviewAt: number;
+  ease: number;
+  interval: number;
+  repetitions: number;
 };
 
 export type Deck = {
@@ -17,13 +18,13 @@ export type Deck = {
 
 export type Review = {
   cardId: string;
-  ts: number; // timestamp odpowiedzi
-  quality: 0 | 1 | 2 | 3 | 4 | 5; // ocena (SM-2)
+  ts: number;
+  quality: 0 | 1 | 2 | 3 | 4 | 5;
 };
 
 export type UserStats = {
   totalReviews: number;
   correct: number;
   streakDays: number;
-  lastReviewDay: string; // YYYY-MM-DD
+  lastReviewDay: string;
 };

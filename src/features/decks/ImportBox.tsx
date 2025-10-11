@@ -3,7 +3,7 @@ import { parseTxt } from "../../domain/parser";
 import { db } from "../../data/db";
 import { nanoid } from "nanoid";
 
-export default function ImportBox() {
+export default function ImportBox({ onImport }: { onImport?: () => void }) {
   const [message, setMessage] = useState<string | null>(null);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -17,9 +17,8 @@ export default function ImportBox() {
       return;
     }
 
-    // Tworzymy nowy zestaw (deck)
     const deckId = nanoid();
-    const deckName = file.name.replace(/\.[^/.]+$/, ""); // bez rozszerzenia
+    const deckName = file.name.replace(/\.[^/.]+$/, "");
 
     await db.transaction("rw", db.decks, db.cards, async () => {
       await db.decks.add({
@@ -44,10 +43,11 @@ export default function ImportBox() {
 
     setMessage(`✅ Zaimportowano ${pairs.length} słówek do zestawu "${deckName}".`);
     e.target.value = ""; // reset inputu
+    onImport?.(); // 🔹 powiadom DecksPage, by odświeżył listę
   }
 
   return (
-    <section style={{ border: "1px solid #ddd", padding: 16, borderRadius: 8 }}>
+    <section style={{ border: "1px solid #ddd", padding: 16, borderRadius: 8, marginBottom: 24 }}>
       <h2>Importuj zestaw słówek (.txt)</h2>
       <p>Każda linia powinna mieć format <code>ang=pol</code></p>
       <input type="file" accept=".txt" onChange={handleFile} />

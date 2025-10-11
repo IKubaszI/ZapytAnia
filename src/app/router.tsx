@@ -2,7 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import DecksPage from "../features/decks/DecksPage";
 import QuizPage from "../features/quiz/QuizPage";
 import StatsPage from "../features/stats/StatsPage";
-import Nav from "../components/Nav";
+import Nav from "./components/Nav";
 
 const router = createBrowserRouter([
   {
