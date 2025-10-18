@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  nickname  String
+  createdAt DateTime  @default(now())
+  reviews   Review[]  // 🔹 relacja do historii powtórek
+}
+
+model FlashcardSet {
+  id        Int         @id @default(autoincrement())
+  name      String
+  cards     Flashcard[]
+  createdAt DateTime    @default(now())
+}
+
+model Flashcard {
+  id       Int          @id @default(autoincrement())
+  front    String
+  back     String
+  setId    Int
+  set      FlashcardSet @relation(fields: [setId], references: [id])
+  reviews  Review[]     // 🔹 relacja do historii powtórek
+}
+
+model Review {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  cardId       Int
+  grade        Int
+  interval     Int
+  repetition   Int
+  easiness     Float
+  nextReviewAt DateTime
+  reviewedAt   DateTime
+  card         Flashcard @relation(fields: [cardId], references: [id])
+  user         User?     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, cardId])
+}

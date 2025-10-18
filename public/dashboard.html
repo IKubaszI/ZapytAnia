@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZapytAnia – Panel użytkownika</title>
+    <link rel="stylesheet" href="/dashboard.css" />
+  </head>
+
+  <body>
+    <!-- ======= Pasek górny ======= -->
+    <header class="topbar">
+      <div class="left">
+        <input type="text" placeholder="🔍 Wyszukaj..." class="search" />
+        <button class="nav-btn">Quizy</button>
+      </div>
+
+      <div class="right">
+        <!-- 🔹 Import fiszek -->
+        <div class="import-box">
+          <h3>📁 Import fiszek</h3>
+          <p>angielskie=polskie</p>
+
+          <input type="file" id="fileInput" accept=".txt" hidden />
+          <input
+            type="text"
+            id="setName"
+            placeholder="Nazwa zestawu"
+            class="set-name"
+          />
+          <button id="importBtn" class="import-btn">
+            <span class="plus">+</span> Importuj
+          </button>
+        </div>
+
+        <!-- 🔹 Profil użytkownika -->
+        <div class="user-card">
+          <div class="avatar" id="userAvatar">?</div>
+          <div class="user-info">
+            <p class="hello">Cześć,</p>
+            <p id="nickname" class="nickname">Gość</p>
+          </div>
+          <button id="logoutBtn" class="logout-btn">Wyloguj</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ======= Zawartość główna ======= -->
+    <main class="content">
+      <section class="main-panel">
+        <div class="flashcard-list">
+          <h3>📘 Twoje zestawy fiszek</h3>
+          <ul id="flashcardSets">
+            <li>Brak zaimportowanych zestawów</li>
+          </ul>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <div class="ranking">
+          <h3>🏆 Ranking</h3>
+          <ul>
+            <li>1. Ania — 19/19</li>
+            <li>2. Kuba — 17/19</li>
+            <li>3. Ola — 16/19</li>
+          </ul>
+        </div>
+
+        <!-- 🔹 Historia nauki POD rankingiem -->
+        <div class="history-card">
+          <h3>🕒 Historia nauki</h3>
+          <ul id="historyList">
+            <li>Brak historii</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <script>
+      // ====== Token check ======
+      const token = localStorage.getItem("token");
+      if (!token) console.warn("Brak tokena – tryb gościa.");
+
+      // ====== Elementy ======
+      const importBtn = document.getElementById("importBtn");
+      const fileInput = document.getElementById("fileInput");
+      const setNameInput = document.getElementById("setName");
+      const flashcardSets = document.getElementById("flashcardSets");
+
+      // ====== Import fiszek ======
+      importBtn.addEventListener("click", () => fileInput.click());
+
+      fileInput.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const setName =
+          setNameInput.value.trim() || file.name.replace(".txt", "");
+        localStorage.setItem("lastSetName", setName);
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("name", setName);
+
+        const res = await fetch("/api/flashcards/import", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          alert(data.message);
+
+          const li = document.createElement("li");
+          li.classList.add("set-item");
+          li.innerHTML = `
+            <span>${setName}</span>
+            <button class="start-btn" data-setid="${data.setId}">▶ Start</button>
+          `;
+          flashcardSets.appendChild(li);
+
+          setNameInput.value = "";
+          renderProgressBars();
+        } else {
+          const err = await res.json();
+          alert("❌ Błąd podczas importu: " + err.message);
+        }
+
+        fileInput.value = "";
+      });
+
+      // ====== Przycisk START ======
+      flashcardSets.addEventListener("click", (e) => {
+        if (e.target.classList.contains("start-btn")) {
+          const setId = e.target.dataset.setid;
+          window.location.href = `/srs.html?set=${setId}`;
+        }
+      });
+
+      // ====== Historia powtórek ======
+      function renderHistory() {
+        const historyList = document.getElementById("historyList");
+        const history = JSON.parse(localStorage.getItem("historySets") || "[]");
+
+        historyList.innerHTML = "";
+
+        if (history.length === 0) {
+          historyList.innerHTML = "<li>Brak historii</li>";
+          return;
+        }
+
+        history.forEach((h) => {
+          const color =
+            h.progress < 50
+              ? "bad"
+              : h.progress < 70
+              ? "mid"
+              : "good";
+
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <span>${h.name}</span>
+            <span class="score ${color}">${h.progress}%</span>
+          `;
+          historyList.appendChild(li);
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", renderHistory);
+
+      // ====== Pasek postępu ======
+      async function renderProgressBars() {
+        try {
+          const res = await fetch("/api/reviews/stats");
+          if (!res.ok) return;
+          const stats = await res.json();
+          const progress = stats.correctRate || 0;
+          const color = progress < 70 ? "#f1c40f" : "#4caf50";
+
+          document.querySelectorAll(".set-item").forEach((li) => {
+            const existing = li.querySelector(".progress-container");
+            if (existing) existing.remove();
+
+            const bar = document.createElement("div");
+            bar.classList.add("progress-container");
+            bar.innerHTML = `
+              <div class="progress-bar">
+                <div class="progress-inner" style="width:${progress}%; background:${color};"></div>
+              </div>
+              <p class="progress-text">${progress}% opanowania</p>
+            `;
+            li.appendChild(bar);
+          });
+        } catch (err) {
+          console.error("❌ Błąd ładowania postępu:", err);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", renderProgressBars);
+
+      // ====== Dane użytkownika ======
+      async function loadUser() {
+        try {
+          const res = await fetch("/api/auth/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const nickname = data.user.nickname || "Użytkownik";
+            document.getElementById("nickname").textContent = nickname;
+            document.getElementById("userAvatar").textContent =
+              nickname[0].toUpperCase();
+          }
+        } catch {
+          console.warn("Tryb gościa – bez logowania.");
+        }
+      }
+
+      loadUser();
+
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      });
+    </script>
+  </body>
+</html>

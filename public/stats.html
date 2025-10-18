@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📊 Statystyki nauki</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+
+  <body style="font-family: Arial; background: #f9f9fb; color: #222;">
+    <main style="max-width: 900px; margin: 60px auto; text-align: center;">
+      <h1>📘 Statystyki nauki</h1>
+      <p>Zobacz swoje postępy w systemie powtórek SRS.</p>
+
+      <div id="summary" style="margin: 40px 0; font-size: 1.2rem;">
+        <p>🔁 Łączna liczba powtórek: <b id="totalReviews">0</b></p>
+        <p>✅ Skuteczność odpowiedzi: <b id="correctRate">0%</b></p>
+        <p>🔥 Seria dni nauki: <b id="streak">0</b></p>
+      </div>
+
+      <div style="margin-top: 50px;">
+        <h3>📅 Aktywność powtórek</h3>
+        <canvas id="chart" width="800" height="300"></canvas>
+      </div>
+    </main>
+
+    <script src="stats.js"></script>
+  </body>
+</html>

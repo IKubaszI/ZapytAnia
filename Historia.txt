@@ -1,4 +1,0 @@
-STary=drań
-FAG=GAF
-ko[=]as
-az=xs

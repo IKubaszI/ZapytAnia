@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel użytkownika</title>
+  <style>
+    body { font-family: Arial; text-align: center; margin-top: 80px; }
+    input, button { padding: 8px; margin: 5px; width: 250px; }
+    button { cursor: pointer; border: none; background: #007bff; color: white; border-radius: 4px; }
+    button:hover { background: #0056b3; }
+    #logout { background: #dc3545; }
+    #logout:hover { background: #a71d2a; }
+  </style>
+</head>
+<body>
+  <h1>👤 Profil użytkownika</h1>
+  <div id="profile"></div>
+
+  <h2>🔒 Zmień hasło</h2>
+  <form onsubmit="changePassword(event)">
+    <input id="newPassword" type="password" placeholder="Nowe hasło" required /><br />
+    <button type="submit">Zmień hasło</button>
+  </form>
+
+  <br />
+  <button id="logout" onclick="logout()">Wyloguj</button>
+
+  <script>
+    async function loadUser() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.href = "/login.html";
+        return;
+      }
+
+      const res = await fetch("/api/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        localStorage.removeItem("token");
+        window.location.href = "/login.html";
+        return;
+      }
+
+      const data = await res.json();
+      document.getElementById("profile").innerHTML = `
+        <p><b>Email:</b> ${data.user.email}</p>
+        <p><b>Konto utworzono:</b> ${new Date(data.user.createdAt).toLocaleString()}</p>
+      `;
+    }
+
+    async function changePassword(e) {
+      e.preventDefault();
+      const newPassword = document.getElementById("newPassword").value;
+      const token = localStorage.getItem("token");
+
+      const res = await fetch("/api/auth/change-password", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ newPassword }),
+      });
+
+      if (res.ok) alert("Hasło zmienione!");
+      else alert("Błąd przy zmianie hasła.");
+    }
+
+    function logout() {
+      localStorage.removeItem("token");
+      window.location.href = "/login.html";
+    }
+
+    loadUser();
+  </script>
+</body>
+</html>

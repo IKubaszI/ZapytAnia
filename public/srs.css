@@ -1,0 +1,179 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #e8ebff, #f5f2fa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  color: #222;
+}
+
+#srs {
+  text-align: center;
+  background: white;
+  padding: 40px 60px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 500px;
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 30px;
+  color: #2a2a2a;
+}
+
+#cardBox {
+  perspective: 1000px;
+  margin-bottom: 30px;
+}
+
+#cardBox p {
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+  padding: 40px 30px;
+  background: #fefefe;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.6s;
+}
+
+#cardBox p:hover {
+  transform: scale(1.05);
+}
+
+#buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+#buttons button {
+  font-size: 1rem;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#buttons button:hover {
+  transform: scale(1.1);
+}
+
+/* Kolory przycisków */
+button[data-grade="0"] {
+  background: #ffccd2;
+  color: #8b0000;
+}
+
+button[data-grade="3"] {
+  background: #fff1cc;
+  color: #8b6f00;
+}
+
+button[data-grade="5"] {
+  background: #ccffd5;
+  color: #006b3f;
+}
+
+/* Animacja */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Efekt flip dla fiszki */
+.flip {
+  transform: rotateY(180deg);
+  transition: transform 0.6s;
+}
+
+#back {
+  display: none;
+  color: #2e6f40;
+  font-weight: bold;
+}
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #f2f0f5;
+  text-align: center;
+  padding-top: 80px;
+}
+
+.srs-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card {
+  background: white;
+  padding: 30px 50px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 40px;
+  width: 360px;
+  min-height: 180px;
+}
+
+.front {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.back {
+  font-size: 22px;
+  color: #333;
+  display: none;
+}
+
+#controls button {
+  padding: 10px 20px;
+  font-size: 18px;
+  margin: 5px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+#checkBtn {
+  background: #007bff;
+  color: white;
+}
+
+.grade-buttons {
+  gap: 10px;
+  justify-content: center;
+}
+
+.bad {
+  background: #f44336;
+  color: white;
+}
+
+.hard {
+  background: #ffc107;
+  color: black;
+}
+
+.easy {
+  background: #4caf50;
+  color: white;
+}

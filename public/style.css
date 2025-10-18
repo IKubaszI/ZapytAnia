@@ -1,0 +1,267 @@
+/* ====== RESET ====== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* ====== LAYOUT ====== */
+body {
+  background: #faf7ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.wrapper {
+  background: #ffffff;
+  border: 2px solid #b85cff;
+  border-radius: 12px;
+  padding: 40px 60px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  max-width: 420px;
+  width: 100%;
+}
+
+/* ====== LOGO ====== */
+.logo {
+  font-size: 28px;
+  font-weight: 700;
+  color: #4b007d;
+  border: 2px solid #b85cff;
+  display: inline-block;
+  padding: 10px 25px;
+  border-radius: 8px;
+  margin-bottom: 35px;
+  background: #faf7ff;
+  transition: 0.3s;
+}
+
+.logo:hover {
+  box-shadow: 0 0 10px rgba(184, 92, 255, 0.4);
+}
+
+/* ====== FORM ====== */
+.auth-box h2 {
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: #4b007d;
+}
+
+.auth-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* ====== INPUTS ====== */
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+  padding: 12px;
+  border: 2px solid #b85cff;
+  border-radius: 6px;
+  outline: none;
+  font-size: 15px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  background-color: #fff;
+}
+
+input[type="email"] {
+  border: 3px solid #2ecc71;
+  background-color: #f6fff8;
+  font-weight: 500;
+}
+
+input[type="email"]:focus {
+  border-color: #27ae60;
+  box-shadow: 0 0 6px rgba(46, 204, 113, 0.5);
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+  border-color: #8500e2;
+  box-shadow: 0 0 6px rgba(133, 0, 226, 0.3);
+}
+
+/* ====== CHECKBOX ====== */
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #333;
+  justify-content: flex-start;
+}
+
+/* ====== BUTTON ====== */
+.submit-btn {
+  background: #b85cff;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.25s;
+  font-size: 15px;
+}
+
+.submit-btn:hover {
+  background: #8500e2;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(184, 92, 255, 0.3);
+}
+
+/* ====== LINK POD FORMULARZEM ====== */
+.register-text {
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.register-text a {
+  color: #8500e2;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register-text a:hover {
+  text-decoration: underline;
+}
+
+/* ========================================================= */
+/* ============ TOASTY (POWIADOMIENIA) ============ */
+/* ========================================================= */
+
+/* kontener */
+.toasts {
+  position: fixed;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+/* pojedynczy toast */
+.toast {
+  --bg: linear-gradient(135deg, #66d37e, #1fa355);
+  background: var(--bg);
+  color: #fff;
+  min-width: 280px;
+  max-width: min(92vw, 520px);
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  line-height: 1.25;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: auto;
+  animation: toast-in 0.3s ease-out forwards;
+}
+
+/* warianty */
+.toast--success { --bg: linear-gradient(135deg, #66d37e, #1fa355); }
+.toast--error   { --bg: linear-gradient(135deg, #ff5b5b, #d63031); }
+.toast--info    { --bg: linear-gradient(135deg, #7aa9ff, #3b7bff); }
+.toast--warn    { --bg: linear-gradient(135deg, #ffcc66, #ff9f1a); }
+
+/* elementy */
+.toast__icon   { font-size: 20px; filter: drop-shadow(0 2px 6px rgba(0,0,0,.22)); }
+.toast__text   { font-weight: 700; }
+.toast__close  {
+  appearance: none;
+  border: 0;
+  background: rgba(255,255,255,.16);
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 900;
+  display: grid;
+  place-items: center;
+  transition: background 0.2s ease, transform 0.08s ease;
+}
+.toast__close:hover  { background: rgba(255,255,255,.25); }
+.toast__close:active { transform: scale(0.96); }
+
+/* animacje */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes toast-out {
+  to { opacity: 0; transform: translateY(-8px); }
+}
+.toast--hide {
+  animation: toast-out 0.22s ease forwards;
+}
+
+/* preferencje użytkownika */
+@media (prefers-reduced-motion: reduce) {
+  .toast, .toast--hide {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ====== MENU ====== */
+.nav-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+/* ====== PRZYCISKI FISZKI / QUIZY / PROSTA NAUKA ====== */
+.nav-btn {
+  width: 230px;               /* 🔹 nieco węższe */
+  height: 70px;               /* 🔹 niższe */
+  border: 3px solid #b85cff;  /* fioletowa ramka */
+  background: #fff;           /* białe tło */
+  color: #6a1b9a;             /* fioletowy tekst */
+  font-size: 18px;            /* 🔹 mniejszy tekst */
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  letter-spacing: 0.5px;
+  box-shadow: 0 3px 10px rgba(184, 92, 255, 0.15);
+}
+
+.nav-btn:hover {
+  background: #b85cff;        /* fioletowe tło po najechaniu */
+  color: #fff;                /* biały tekst */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(184, 92, 255, 0.35);
+}
+
+/* Na mniejszych ekranach */
+@media (max-width: 900px) {
+  .nav-menu {
+    flex-direction: column;
+    gap: 18px;
+  }
+  .nav-btn {
+    width: 100%;
+    max-width: 260px;
+  }
+}

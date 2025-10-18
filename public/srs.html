@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Powtórki SRS</title>
+  <link rel="stylesheet" href="/srs.css" />
+</head>
+<body>
+  <main class="srs-container">
+  <div class="card">
+    <div id="front" class="front">Ładowanie...</div>
+    <div id="back" class="back"></div>
+  </div>
+
+  <div id="controls">
+    <button id="checkBtn">👀 Sprawdź</button>
+    <div id="buttons" class="grade-buttons" style="display:none;">
+      <button data-grade="0" class="bad">❌ Nie pamiętam</button>
+      <button data-grade="3" class="hard">😬 Trudne</button>
+      <button data-grade="5" class="easy">✅ Łatwe</button>
+    </div>
+  </div>
+</main>
+
+
+  <script src="srs.js"></script>
+</body>
+</html>

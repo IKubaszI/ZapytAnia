@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rejestracja — ZapytAnia</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div id="toasts" class="toasts"></div>
+
+    <main class="wrapper">
+      <h1 class="logo">ZapytAnia</h1>
+
+      <section class="auth-box">
+        <h2>Rejestracja</h2>
+
+        <form id="registerForm">
+          <input type="text" id="nickname" name="nickname" placeholder="Nick" required />
+          <input type="email" id="email" name="email" placeholder="E-mail" required />
+          <input type="password" id="password" name="password" placeholder="Hasło" required />
+
+          <div class="checkbox">
+            <input type="checkbox" id="showPassword" />
+            <label for="showPassword">Pokaż hasło</label>
+          </div>
+
+          <button type="submit" class="submit-btn">Zarejestruj się</button>
+
+          <p class="register-text">
+            Masz już konto? <a href="/">Zaloguj się</a>
+          </p>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      // pokaż/ukryj hasło
+      const pw = document.getElementById("password");
+      document.getElementById("showPassword").addEventListener("change", (e) => {
+        pw.type = e.target.checked ? "text" : "password";
+      });
+
+      // rejestracja
+      document.getElementById("registerForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const nickname = document.getElementById("nickname").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        if (!nickname || !email || !password) {
+          return toast("Uzupełnij wszystkie pola.", "warn");
+        }
+
+        try {
+          const resp = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nickname, email, password }),
+          });
+          const data = await resp.json();
+
+          if (resp.ok) {
+            toast("Zarejestrowano pomyślnie!", "success");
+            setTimeout(() => (window.location.href = "/"), 2000);
+          } else {
+            toast(data.message || "Błąd rejestracji.", "error");
+          }
+        } catch {
+          toast("Błąd połączenia z serwerem.", "error");
+        }
+      });
+
+      // TOAST API
+      function toast(message, type = "success") {
+        const area = document.getElementById("toasts");
+        const el = document.createElement("div");
+        el.className = `toast toast--${type}`;
+        const icon = type === "error" ? "⚠️" : type === "warn" ? "⚠️" : type === "info" ? "ℹ️" : "✅";
+        el.innerHTML = `
+          <span class="toast__icon">${icon}</span>
+          <span class="toast__text">${message}</span>
+          <button class="toast__close" aria-label="Zamknij">×</button>
+        `;
+        el.querySelector(".toast__close").onclick = () => hideToast(el);
+        area.appendChild(el);
+        setTimeout(() => hideToast(el), 2500);
+      }
+      function hideToast(el) {
+        el.classList.add("toast--hide");
+        el.addEventListener("animationend", () => el.remove(), { once: true });
+      }
+    </script>
+  </body>
+</html>

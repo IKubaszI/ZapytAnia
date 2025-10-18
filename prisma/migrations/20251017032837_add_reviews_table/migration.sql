@@ -1,0 +1,14 @@
+-- CreateTable
+CREATE TABLE "Review" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "cardId" INTEGER NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "grade" INTEGER NOT NULL,
+    "interval" INTEGER NOT NULL,
+    "repetition" INTEGER NOT NULL,
+    "easiness" REAL NOT NULL,
+    "nextReviewAt" DATETIME NOT NULL,
+    "reviewedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Review_cardId_fkey" FOREIGN KEY ("cardId") REFERENCES "Flashcard" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Review_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
