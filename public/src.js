@@ -1,51 +1,86 @@
-const API = "http://localhost:3000/api/reviews";
+// ====== KONFIGURACJA ======
+const API = "http://localhost:3000/api";
+const params = new URLSearchParams(window.location.search);
+const setId = params.get("set");
+const mode = params.get("mode") || "srs";
+
 const frontEl = document.getElementById("front");
 const backEl = document.getElementById("back");
 const buttons = document.querySelectorAll("#buttons button");
+
 let currentCard = null;
+let cardsQueue = [];
 let token = localStorage.getItem("token");
 
-// 🔹 Pobieranie fiszki do powtórki
-async function loadNextCard() {
+// ====== POBIERZ FISZKI ======
+async function loadCards() {
+  if (!setId) {
+    frontEl.textContent = "❌ Brak ID zestawu w adresie URL.";
+    return;
+  }
+
   try {
-    const res = await fetch(`${API}/next`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    let res;
+    if (mode === "all") {
+      // 🧠 pełny trening — wszystkie fiszki zestawu
+      res = await fetch(`${API}/flashcards/set/${setId}`);
+    } else {
+      // 🔁 tryb SRS — tylko do powtórki
+      res = await fetch(`${API}/reviews/due?setId=${setId}`);
+    }
 
-    const cards = await res.json();
+    if (!res.ok) throw new Error(`Błąd HTTP ${res.status}`);
+    cardsQueue = await res.json();
 
-    if (!cards.length) {
-      frontEl.textContent = "🎉 Brak fiszek do powtórki!";
+    if (!cardsQueue.length) {
+      frontEl.textContent = "🎉 Brak fiszek do nauki!";
       backEl.style.display = "none";
       buttons.forEach((b) => (b.disabled = true));
       return;
     }
 
-    currentCard = cards[0];
-    frontEl.textContent = currentCard.front;
-    backEl.textContent = currentCard.back;
-    backEl.style.display = "none";
+    nextCard();
   } catch (err) {
-    console.error("Błąd pobierania fiszki:", err);
-    frontEl.textContent = "❌ Błąd połączenia z serwerem.";
+    console.error("❌ Błąd ładowania fiszek:", err);
+    frontEl.textContent = "❌ Nie udało się pobrać fiszek.";
   }
 }
 
-// 🔹 Kliknięcie w kartę — pokazuje tłumaczenie
+// ====== POKAŻ KOLEJNĄ FISZKĘ ======
+function nextCard() {
+  if (cardsQueue.length === 0) {
+    frontEl.textContent = "🏁 Koniec sesji!";
+    backEl.style.display = "none";
+    buttons.forEach((b) => (b.disabled = true));
+    return;
+  }
+
+  currentCard = cardsQueue.shift();
+  frontEl.textContent = currentCard.front;
+  backEl.textContent = currentCard.back;
+  backEl.style.display = "none";
+}
+
+// ====== POKAŻ TŁUMACZENIE ======
 frontEl.addEventListener("click", () => {
   backEl.style.display = "block";
 });
 
-// 🔹 Po kliknięciu — wysyła wynik do backendu i ładuje następną fiszkę
+// ====== OCENIANIE (tylko SRS) ======
 buttons.forEach((btn) => {
   btn.addEventListener("click", async () => {
     if (!currentCard) return;
     const grade = parseInt(btn.dataset.grade);
 
+    // 🧠 tryb pełny – nie zapisujemy ocen
+    if (mode === "all") {
+      nextCard();
+      return;
+    }
+
+    // 🔁 tryb SRS – zapisujemy powtórkę
     try {
-      await fetch(`${API}/submit`, {
+      await fetch(`${API}/reviews/submit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -56,13 +91,12 @@ buttons.forEach((btn) => {
           grade,
         }),
       });
-
-      await loadNextCard();
+      nextCard();
     } catch (err) {
-      console.error("Błąd wysyłania oceny:", err);
+      console.error("❌ Błąd wysyłania oceny:", err);
     }
   });
 });
 
-// 🔹 Start
-loadNextCard();
+// ====== START ======
+document.addEventListener("DOMContentLoaded", loadCards);

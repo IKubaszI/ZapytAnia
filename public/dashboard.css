@@ -474,3 +474,39 @@ body {
 .sidebar > * {
   width: 100%; /* ✅ historia i ranking tej samej szerokości */
 }
+.btn-srs, .btn-all, .btn-view, .btn-del {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.btn-srs { background: #4caf50; color: white; }
+.btn-all { background: #2196f3; color: white; }
+.btn-view { background: #9c27b0; color: white; }
+.btn-del { background: #e74c3c; color: white; }
+
+.btn-srs:hover { background: #45a049; }
+.btn-all:hover { background: #1e88e5; }
+.btn-view:hover { background: #8e24aa; }
+.btn-del:hover { background: #c0392b; }
+
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 600px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}

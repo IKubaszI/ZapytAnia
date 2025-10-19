@@ -1,7 +1,11 @@
-const urlParams = new URLSearchParams(window.location.search);
-const setId = urlParams.get("set");
+// ====== KONFIGURACJA ======
+const API = "http://localhost:3000/api";
+const params = new URLSearchParams(window.location.search);
+const setId = params.get("set");
+const mode = params.get("mode") || "srs";
 const token = localStorage.getItem("token");
 
+// ====== ELEMENTY HTML ======
 const frontEl = document.getElementById("front");
 const backEl = document.getElementById("back");
 const checkBtn = document.getElementById("checkBtn");
@@ -11,26 +15,31 @@ const buttons = document.querySelectorAll("#buttons button");
 let cards = [];
 let currentIndex = 0;
 
-// 🔹 Ładowanie fiszek do powtórki (tylko te na dziś)
+// ====== POBIERZ FISZKI ======
 async function loadCards() {
+  if (!setId) {
+    frontEl.textContent = "❌ Brak ID zestawu w adresie URL.";
+    return;
+  }
+
   try {
-    console.log("👉 Ładuję fiszki do powtórki dla setId:", setId);
-
-    const res = await fetch(`/api/reviews/due?setId=${setId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!res.ok) {
-      frontEl.textContent = "❌ Błąd pobierania fiszek.";
-      console.error(await res.text());
-      return;
+    let res;
+    if (mode === "all") {
+      console.log("🧠 Tryb pełny — pobieram wszystkie fiszki z zestawu:", setId);
+      res = await fetch(`${API}/flashcards/set/${setId}`);
+    } else {
+      console.log("🔁 Tryb SRS — pobieram fiszki do powtórki dla zestawu:", setId);
+      res = await fetch(`${API}/reviews/due?setId=${setId}`);
     }
 
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     cards = await res.json();
-    console.log("📦 Otrzymane fiszki do powtórki:", cards);
 
     if (!cards.length) {
-      frontEl.textContent = "🎉 Wszystkie fiszki są powtórzone na dziś!";
+      frontEl.textContent =
+        mode === "all"
+          ? "📭 Brak fiszek w zestawie!"
+          : "🎉 Wszystkie fiszki są powtórzone na dziś!";
       backEl.textContent = "";
       checkBtn.style.display = "none";
       gradeButtons.style.display = "none";
@@ -39,14 +48,16 @@ async function loadCards() {
 
     showCard();
   } catch (err) {
-    console.error("❌ Błąd połączenia:", err);
+    console.error("❌ Błąd ładowania fiszek:", err);
     frontEl.textContent = "❌ Nie udało się załadować fiszek.";
   }
 }
 
-// 🔹 Pokazanie fiszki
+// ====== POKAŻ AKTUALNĄ FISZKĘ ======
 function showCard() {
   const card = cards[currentIndex];
+  if (!card) return;
+
   frontEl.textContent = card.front || "(brak tekstu)";
   backEl.textContent = card.back || "";
   backEl.style.display = "none";
@@ -54,24 +65,32 @@ function showCard() {
   checkBtn.style.display = "inline-block";
 }
 
-// 🔹 Klik „Sprawdź” — pokaż tłumaczenie
+// ====== KLIK: SPRAWDŹ ======
 checkBtn.addEventListener("click", () => {
   backEl.style.display = "block";
   gradeButtons.style.display = "flex";
   checkBtn.style.display = "none";
 });
 
-// 🔹 Klik oceny (❌ / 😐 / ✅)
+// ====== KLIK: OCENY ======
 buttons.forEach((btn) => {
   btn.addEventListener("click", async () => {
     const grade = parseInt(btn.dataset.grade);
     const card = cards[currentIndex];
 
-    console.log(`📘 ${card.front} → ocena ${grade}`);
+    if (!card) return;
 
-    // 🔸 Wyślij ocenę do backendu
+    if (mode === "all") {
+      // 🧠 tryb pełny — nie zapisujemy, tylko dalej
+      currentIndex++;
+      if (currentIndex < cards.length) showCard();
+      else finishSession();
+      return;
+    }
+
+    // 🔁 tryb SRS — zapis oceny
     try {
-      await fetch("/api/reviews/submit", {
+      await fetch(`${API}/reviews/submit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -86,19 +105,25 @@ buttons.forEach((btn) => {
       console.error("❌ Błąd wysyłania oceny:", err);
     }
 
-    // 🔸 Następna karta
     currentIndex++;
     if (currentIndex < cards.length) showCard();
-    else {
-  frontEl.textContent = "🎉 Powtórka zakończona!";
+    else finishSession();
+  });
+});
+
+// ====== ZAKOŃCZENIE SESJI ======
+function finishSession() {
+  frontEl.textContent =
+    mode === "all" ? "🏁 Koniec treningu pełnego!" : "🎉 Powtórka zakończona!";
   backEl.textContent = "";
   gradeButtons.style.display = "none";
   checkBtn.style.display = "none";
 
-  // 🔹 Zapis do historii lokalnej
-  const setName = new URLSearchParams(window.location.search).get("setName") || "Zestaw";
-  const setId = new URLSearchParams(window.location.search).get("set");
-  const progress = Math.floor(Math.random() * 30 + 70); // przykładowe % (docelowo można pobrać z /api/reviews/stats)
+  // 🔹 Zapis do lokalnej historii
+  const setName =
+    new URLSearchParams(window.location.search).get("setName") || "Zestaw";
+  const progress =
+    mode === "all" ? 0 : Math.floor(Math.random() * 30 + 70); // przykładowy %
 
   let history = JSON.parse(localStorage.getItem("historySets") || "[]");
   const existing = history.find((h) => h.setId === setId);
@@ -111,15 +136,11 @@ buttons.forEach((btn) => {
 
   localStorage.setItem("historySets", JSON.stringify(history));
 
-  // 🔹 Powrót po chwili
+  // 🔹 Automatyczny powrót do panelu po 1.5 sekundy
   setTimeout(() => {
     window.location.href = "/dashboard.html";
   }, 1500);
 }
 
-
-  });
-});
-
-// 🔹 Start
-loadCards();
+// ====== START ======
+document.addEventListener("DOMContentLoaded", loadCards);

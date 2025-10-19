@@ -121,6 +121,7 @@
 
           setNameInput.value = "";
           renderProgressBars();
+          renderHistory(); // ✅ odśwież historię po imporcie
         } else {
           const err = await res.json();
           alert("❌ Błąd podczas importu: " + err.message);
@@ -137,66 +138,162 @@
         }
       });
 
-      // ====== Historia powtórek ======
-      function renderHistory() {
-        const historyList = document.getElementById("historyList");
-        const history = JSON.parse(localStorage.getItem("historySets") || "[]");
+      // ====== Historia nauki ======
+async function renderHistory() {
+  const historyList = document.getElementById("historyList");
+  historyList.innerHTML = "<li>⏳ Ładowanie historii...</li>";
 
-        historyList.innerHTML = "";
+  try {
+    const res = await fetch("/api/reviews/history");
+    if (!res.ok) throw new Error("Błąd pobierania historii");
 
-        if (history.length === 0) {
-          historyList.innerHTML = "<li>Brak historii</li>";
-          return;
-        }
+    let history = await res.json();
+    historyList.innerHTML = "";
 
-        history.forEach((h) => {
-          const color =
-            h.progress < 50
-              ? "bad"
-              : h.progress < 70
-              ? "mid"
-              : "good";
+    if (!history.length) {
+      historyList.innerHTML = "<li>Brak historii nauki</li>";
+      return;
+    }
 
-          const li = document.createElement("li");
-          li.innerHTML = `
-            <span>${h.name}</span>
-            <span class="score ${color}">${h.progress}%</span>
-          `;
-          historyList.appendChild(li);
-        });
-      }
+    // 🔹 SORTUJEMY — najnowsze (minutesAgo = najmniejsze) na górze
+    history = history.sort((a, b) => {
+      if (a.minutesAgo === null) return 1; // brak danych → na końcu
+      if (b.minutesAgo === null) return -1;
+      return a.minutesAgo - b.minutesAgo;
+    });
+
+    history.forEach((h) => {
+      const color =
+        h.mastery < 50 ? "bad" : h.mastery < 70 ? "mid" : "good";
+      const agoText = h.minutesAgo
+        ? `${h.minutesAgo} min temu`
+        : "brak danych";
+
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div>
+          <strong>${h.setName}</strong><br>
+          <small>${agoText}</small>
+        </div>
+        <span class="score ${color}">${h.mastery}%</span>
+      `;
+      historyList.appendChild(li);
+    });
+  } catch (err) {
+    console.error("❌ Błąd historii nauki:", err);
+    historyList.innerHTML = "<li>❌ Błąd ładowania historii</li>";
+  }
+}
 
       document.addEventListener("DOMContentLoaded", renderHistory);
 
       // ====== Pasek postępu ======
-      async function renderProgressBars() {
-        try {
-          const res = await fetch("/api/reviews/stats");
-          if (!res.ok) return;
-          const stats = await res.json();
-          const progress = stats.correctRate || 0;
-          const color = progress < 70 ? "#f1c40f" : "#4caf50";
+      // ====== 📘 Wyświetlanie zestawów fiszek ======
+async function renderFlashcardSets() {
+  const container = document.getElementById("flashcardSets");
+  container.innerHTML = "<li>⏳ Ładowanie zestawów...</li>";
 
-          document.querySelectorAll(".set-item").forEach((li) => {
-            const existing = li.querySelector(".progress-container");
-            if (existing) existing.remove();
+  try {
+    const res = await fetch("/api/flashcards/all");
+    if (!res.ok) throw new Error("Błąd pobierania zestawów");
+    const sets = await res.json();
 
-            const bar = document.createElement("div");
-            bar.classList.add("progress-container");
-            bar.innerHTML = `
-              <div class="progress-bar">
-                <div class="progress-inner" style="width:${progress}%; background:${color};"></div>
-              </div>
-              <p class="progress-text">${progress}% opanowania</p>
-            `;
-            li.appendChild(bar);
-          });
-        } catch (err) {
-          console.error("❌ Błąd ładowania postępu:", err);
-        }
-      }
+    if (!sets.length) {
+      container.innerHTML = "<li>Brak zestawów. Zaimportuj plik .txt 👇</li>";
+      return;
+    }
 
-      document.addEventListener("DOMContentLoaded", renderProgressBars);
+    container.innerHTML = "";
+    sets.forEach((set) => {
+      const li = document.createElement("li");
+      li.classList.add("set-item");
+
+      li.innerHTML = `
+        <div>
+          <strong>${set.name}</strong><br>
+          <small>${set.count} słówek • ${new Date(
+            set.createdAt
+          ).toLocaleDateString("pl-PL")}</small>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button class="btn-srs" data-id="${set.id}">🔁 Powtórka SRS</button>
+          <button class="btn-all" data-id="${set.id}">🧠 Trening pełny</button>
+          <button class="btn-view" data-id="${set.id}">👁️ Podgląd</button>
+          <button class="btn-del" data-id="${set.id}">🗑️ Usuń</button>
+        </div>
+      `;
+
+      container.appendChild(li);
+    });
+  } catch (err) {
+    console.error("❌ Błąd ładowania zestawów:", err);
+    container.innerHTML = "<li>Błąd ładowania zestawów</li>";
+  }
+}
+
+// ====== Obsługa przycisków w zestawach ======
+document
+  .getElementById("flashcardSets")
+  .addEventListener("click", async (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    const id = btn.dataset.id;
+
+    if (btn.classList.contains("btn-srs")) {
+      window.location.href = `/srs.html?set=${id}&mode=srs`;
+    }
+
+    if (btn.classList.contains("btn-all")) {
+      window.location.href = `/srs.html?set=${id}&mode=all`;
+    }
+
+    if (btn.classList.contains("btn-view")) {
+      const res = await fetch(`/api/flashcards/set/${id}`);
+      const cards = await res.json();
+
+      const rows = cards
+        .map(
+          (c, i) =>
+            `<tr><td>${i + 1}</td><td>${c.front}</td><td>${c.back}</td></tr>`
+        )
+        .join("");
+
+      const html = `
+        <div class="modal-bg" id="modal">
+          <div class="modal">
+            <h3>📘 ${cards.length} fiszek</h3>
+            <table border="1" style="width:100%;border-collapse:collapse;">
+              <thead><tr><th>#</th><th>Front</th><th>Back</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+            <button id="closeModal" style="margin-top:10px;">Zamknij</button>
+          </div>
+        </div>
+      `;
+
+      document.body.insertAdjacentHTML("beforeend", html);
+      document
+        .getElementById("closeModal")
+        .addEventListener("click", () =>
+          document.getElementById("modal").remove()
+        );
+    }
+
+    if (btn.classList.contains("btn-del")) {
+      if (!confirm("Na pewno chcesz usunąć ten zestaw?")) return;
+      await fetch(`/api/flashcards/delete/${id}`, { method: "DELETE" });
+      renderFlashcardSets();
+      renderHistory(); // ✅ odśwież historię
+    }
+  });
+
+// ====== Start ======
+document.addEventListener("DOMContentLoaded", () => {
+  renderFlashcardSets();
+  renderHistory();
+});
+
 
       // ====== Dane użytkownika ======
       async function loadUser() {

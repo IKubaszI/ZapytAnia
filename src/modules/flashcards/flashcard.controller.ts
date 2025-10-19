@@ -9,15 +9,9 @@ import { ensureReviewsForSet } from "../reviews/review.model";
 export async function importFlashcards(req: Request, res: Response) {
   try {
     const { name } = req.body;
+    if (!req.file) return res.status(400).json({ message: "Brak pliku .txt" });
 
-    if (!req.file) {
-      return res.status(400).json({ message: "Brak pliku .txt" });
-    }
-
-    // ✅ Wczytaj zawartość pliku
     const text = await fs.readFile(req.file.path, "utf-8");
-
-    // ✅ Parsowanie: każda linia to "front=back"
     const cards = text
       .split("\n")
       .map((line) => line.trim())
@@ -27,18 +21,13 @@ export async function importFlashcards(req: Request, res: Response) {
         return { front, back };
       });
 
-    if (!cards.length) {
-      return res
-        .status(400)
-        .json({ message: "Plik nie zawiera poprawnych fiszek." });
-    }
+    if (!cards.length)
+      return res.status(400).json({ message: "Plik nie zawiera poprawnych fiszek." });
 
-    // ✅ Tworzymy nowy zestaw
     const set = await prisma.flashcardSet.create({
       data: { name: name || "Nowy zestaw" },
     });
 
-    // ✅ Zapis fiszek do bazy
     await prisma.flashcard.createMany({
       data: cards.map((c) => ({
         front: c.front,
@@ -47,45 +36,54 @@ export async function importFlashcards(req: Request, res: Response) {
       })),
     });
 
-    // ✅ Sprawdź, czy istnieje tabela Review — tylko jeśli istnieje funkcja
     try {
       await ensureReviewsForSet(1, set.id);
-    } catch (err) {
+    } catch {
       console.warn("⚠️ Pomijam review.sync — tabela Review może nie istnieć.");
     }
 
     res.status(201).json({
-      message: `✅ Zaimportowano ${cards.length} fiszek z pliku ${req.file.originalname}`,
+      message: `✅ Zaimportowano ${cards.length} fiszek.`,
       setId: set.id,
     });
-  } catch (error: any) {
-    console.error("❌ Błąd importu fiszek:", error.message);
+  } catch (err) {
+    console.error("❌ Błąd importu fiszek:", err);
     res.status(500).json({ message: "Błąd serwera przy imporcie fiszek" });
   }
 }
 
 /**
- * 🔹 Pobierz wszystkie zestawy
+ * 🔹 Pobierz wszystkie zestawy (dla panelu)
  */
 export async function getAllFlashcards(_req: Request, res: Response) {
   try {
     const sets = await prisma.flashcardSet.findMany({
-      include: { cards: true },
+      include: {
+        cards: true,
+      },
       orderBy: { id: "desc" },
     });
-    res.json(sets);
-  } catch (error) {
-    console.error("❌ Błąd pobierania fiszek:", error);
-    res.status(500).json({ message: "Błąd pobierania fiszek" });
+
+    const result = sets.map((set) => ({
+      id: set.id,
+      name: set.name,
+      count: set.cards.length,
+      createdAt: set.createdAt,
+    }));
+
+    res.json(result);
+  } catch (err) {
+    console.error("❌ Błąd pobierania zestawów:", err);
+    res.status(500).json({ message: "Błąd serwera przy pobieraniu zestawów." });
   }
 }
 
 /**
- * 🔹 Pobierz fiszki z danego zestawu (np. dla SRS)
+ * 🔹 Pobierz wszystkie fiszki z zestawu (dla SRS i podglądu)
  */
 export async function getFlashcardsBySet(req: Request, res: Response) {
   try {
-    const setId = Number(req.query.setId);
+    const setId = Number(req.params.id);
     if (!setId) return res.status(400).json({ message: "Brak setId" });
 
     const cards = await prisma.flashcard.findMany({
@@ -97,5 +95,23 @@ export async function getFlashcardsBySet(req: Request, res: Response) {
   } catch (error) {
     console.error("❌ Błąd pobierania fiszek z zestawu:", error);
     res.status(500).json({ message: "Błąd serwera przy pobieraniu fiszek" });
+  }
+}
+
+/**
+ * 🔹 Usuń zestaw + wszystkie fiszki
+ */
+export async function deleteFlashcardSet(req: Request, res: Response) {
+  try {
+    const setId = Number(req.params.id);
+    if (!setId) return res.status(400).json({ message: "Brak ID zestawu" });
+
+    await prisma.flashcard.deleteMany({ where: { setId } });
+    await prisma.flashcardSet.delete({ where: { id: setId } });
+
+    res.json({ message: "✅ Zestaw i jego fiszki zostały usunięte." });
+  } catch (err) {
+    console.error("❌ Błąd usuwania zestawu:", err);
+    res.status(500).json({ message: "Błąd serwera przy usuwaniu zestawu." });
   }
 }

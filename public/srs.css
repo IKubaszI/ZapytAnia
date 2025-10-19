@@ -177,3 +177,10 @@ body {
   background: #4caf50;
   color: white;
 }
+#srs h1::after {
+  content: attr(data-mode);
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #888;
+}
