@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 // POPRAWKA: Rozdzielenie importów wartości i typów
-import { Table, Breadcrumb, Tag, Button, Modal, Input, Form, message, Space, Dropdown, Popconfirm } from 'antd';
+import { Table, Breadcrumb, Tag, Button, Modal, Input, Form, message, Space, Dropdown } from 'antd';
 import type { MenuProps } from 'antd'; 
 
-import { PlusOutlined, DeleteOutlined, DownOutlined, ReloadOutlined, ExportOutlined, FileTextOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, DownOutlined, ReloadOutlined, FileTextOutlined } from '@ant-design/icons';
 import { studyRepository } from '../../services/repositories/studyRepository';
 import { profileRepository } from '../../services/repositories/profileRepository';
 import type { Card } from '../../domain/models';

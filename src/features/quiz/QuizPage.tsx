@@ -8,7 +8,7 @@ import { calculateNextReview } from '../../domain/srs';
 import { Grade, type Card } from '../../domain/models';
 import Confetti from 'react-confetti';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const DAILY_GOAL = 20;
 

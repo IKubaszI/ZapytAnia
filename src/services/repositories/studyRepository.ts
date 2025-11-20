@@ -1,5 +1,5 @@
 import { db } from '../db';
-import type { Card, Deck, Review } from '../../domain/models';
+import type { Card, Review } from '../../domain/models';
 
 const ensureProfile = (profileId: number | null) => {
   if (!profileId) throw new Error("No active profile");
