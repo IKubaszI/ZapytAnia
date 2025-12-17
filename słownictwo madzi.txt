@@ -1,0 +1,6 @@
+Pole=Dwór
+Ziemniak=Kartfoel
+chleb z jajkeim=jajochlebki
+toster=grzanker
+sandwitcher=testerem
+przepraszam=no dobra ehhh
