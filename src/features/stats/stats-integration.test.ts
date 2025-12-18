@@ -77,7 +77,7 @@ describe('Stats Integration Tests', () => {
                 }
             }
 
-            // ASSERT - sprawdź streak
+            // ASSERT - check streak
             expect(stats).toHaveLength(7);
             expect(currentStreak).toBe(7);
             expect(Object.keys(activityMap)).toHaveLength(7);
@@ -90,7 +90,7 @@ describe('Stats Integration Tests', () => {
                 { deckId: testDeckId, profileId: testProfileId, front: 'b', back: 'B', nextReviewAt: Date.now(), ease: 2.5, interval: 1, repetitions: 0 },
             ]);
 
-            // ARRANGE - dodaj 50 recenzji (30 poprawnych, 20 błędnych)
+            // ARRANGE 
             const reviews = [];
             for (let i = 0; i < 50; i++) {
                 reviews.push({
@@ -112,7 +112,7 @@ describe('Stats Integration Tests', () => {
             const correct = stats.filter(r => r.grade >= 3).length;
             const accuracy = Math.round((correct / total) * 100);
 
-            // ASSERT - sprawdź osiągnięcia
+            // ASSERT - check achievements
             expect(total).toBe(50);
             expect(correct).toBe(30);
             expect(accuracy).toBe(60);
@@ -125,6 +125,107 @@ describe('Stats Integration Tests', () => {
             expect(firstStepUnlocked).toBe(true);
             expect(veteranUnlocked).toBe(true);
             expect(perfectionistUnlocked).toBe(false); // Only 30 correct, need 50
+        });
+    });
+
+    describe('Backup and Restore Integration', () => {
+        it('should successfully backup and restore complete profile data', async () => {
+            // ARRANGE - Create complete profile with decks, cards, and reviews
+            const cardsData = [
+                { front: 'backup1', back: 'test1' },
+                { front: 'backup2', back: 'test2' },
+            ];
+            await studyRepository.importCardsSmart(testDeckId, testProfileId, cardsData);
+            const cards = await studyRepository.getCardsForDeck(testDeckId);
+
+            // Add some reviews
+            await studyRepository.saveReview({
+                cardId: cards[0].id!,
+                profileId: testProfileId,
+                deckId: testDeckId,
+                grade: 5,
+                reviewedAt: Date.now(),
+                mode: 'srs',
+            });
+
+            // ACT - Export data
+            const profile = await db.profiles.get(testProfileId);
+            const decks = await db.decks.where({ profileId: testProfileId }).toArray();
+            const allCards = await db.cards.where({ profileId: testProfileId }).toArray();
+            const reviews = await db.reviews.where({ profileId: testProfileId }).toArray();
+
+            const backup = {
+                profile,
+                decks,
+                cards: allCards,
+                reviews,
+            };
+
+            // ACT - Clear data
+            await db.reviews.where({ profileId: testProfileId }).delete();
+            await db.cards.where({ profileId: testProfileId }).delete();
+            await db.decks.where({ profileId: testProfileId }).delete();
+
+            // ACT - Restore from backup
+            await db.decks.bulkAdd(backup.decks);
+            await db.cards.bulkAdd(backup.cards);
+            await db.reviews.bulkAdd(backup.reviews);
+
+            // ASSERT - Verify restoration
+            const restoredDecks = await db.decks.where({ profileId: testProfileId }).toArray();
+            const restoredCards = await db.cards.where({ profileId: testProfileId }).toArray();
+            const restoredReviews = await db.reviews.where({ profileId: testProfileId }).toArray();
+
+            expect(restoredDecks).toHaveLength(1);
+            expect(restoredCards).toHaveLength(2);
+            expect(restoredReviews).toHaveLength(1);
+        });
+    });
+
+    describe('Multi-Deck Statistics Aggregation', () => {
+        it('should correctly aggregate statistics across multiple decks', async () => {
+            // ARRANGE - Create second deck
+            const testDeckId2 = 5555;
+            await db.decks.add({
+                id: testDeckId2,
+                name: 'Second Test Deck',
+                profileId: testProfileId,
+                createdAt: Date.now(),
+            });
+
+            // ARRANGE - Add cards to both decks
+            const deck1Cards = await db.cards.bulkAdd([
+                { deckId: testDeckId, profileId: testProfileId, front: 'd1c1', back: 'D1C1', nextReviewAt: Date.now(), ease: 2.5, interval: 1, repetitions: 0 },
+                { deckId: testDeckId, profileId: testProfileId, front: 'd1c2', back: 'D1C2', nextReviewAt: Date.now(), ease: 2.5, interval: 1, repetitions: 0 },
+            ]);
+
+            const deck2Cards = await db.cards.bulkAdd([
+                { deckId: testDeckId2, profileId: testProfileId, front: 'd2c1', back: 'D2C1', nextReviewAt: Date.now(), ease: 2.5, interval: 1, repetitions: 0 },
+            ]);
+
+            // ACT - Add reviews to both decks
+            await db.reviews.bulkAdd([
+                { cardId: deck1Cards[0] as number, profileId: testProfileId, deckId: testDeckId, grade: 5, reviewedAt: Date.now(), mode: 'srs' as const },
+                { cardId: deck1Cards[1] as number, profileId: testProfileId, deckId: testDeckId, grade: 3, reviewedAt: Date.now(), mode: 'srs' as const },
+                { cardId: deck2Cards[0] as number, profileId: testProfileId, deckId: testDeckId2, grade: 5, reviewedAt: Date.now(), mode: 'training' as const },
+            ]);
+
+            // ACT - Get aggregated stats
+            const allStats = await studyRepository.getStats(testProfileId);
+            const todayCount = await studyRepository.getTodayReviewCount(testProfileId);
+
+            // ASSERT
+            expect(allStats).toHaveLength(3); // Reviews from both decks
+            expect(todayCount).toBe(3); // Total reviews today from all decks
+
+            // Verify mix of modes
+            const srsReviews = allStats.filter(r => r.mode === 'srs');
+            const trainingReviews = allStats.filter(r => r.mode === 'training');
+            expect(srsReviews).toHaveLength(2);
+            expect(trainingReviews).toHaveLength(1);
+
+            // Cleanup second deck
+            await db.decks.delete(testDeckId2);
         });
     });
 });

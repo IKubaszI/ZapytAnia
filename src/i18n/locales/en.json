@@ -102,6 +102,7 @@
         "reverseMode": "Reverse (Eng → Pol)",
         "writingHint": "Type answer and press Enter.",
         "quizHint": "Spacebar (Show), 1/2/3 (Grade)",
+        "trainingHint": "Spacebar (Show), 1 (Wrong) / 2 (Good)",
         "dictionary": "Dictionary",
         "rateResult": "How do you rate this result?",
         "typo": "Typo",

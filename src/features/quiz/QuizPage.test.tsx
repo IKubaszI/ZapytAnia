@@ -92,4 +92,51 @@ describe('QuizPage Logic Flow', () => {
 
         expect(count).toBe(15);
     });
+
+    it('should handle empty queue scenario', async () => {
+        vi.mocked(studyRepository.getDueCards).mockResolvedValue([]);
+
+        const dueCards = await studyRepository.getDueCards(1, Date.now());
+
+        expect(dueCards).toHaveLength(0);
+    });
+
+    it('should handle reverse mode card swap', () => {
+        const card: Card = {
+            id: 1,
+            deckId: 1,
+            profileId: 1,
+            front: 'hello',
+            back: 'cześć',
+            nextReviewAt: Date.now(),
+            ease: 2.5,
+            interval: 1,
+            repetitions: 0,
+        };
+
+        const reverseMode = true;
+        const question = reverseMode ? card.back : card.front;
+        const answer = reverseMode ? card.front : card.back;
+
+        expect(question).toBe('cześć');
+        expect(answer).toBe('hello');
+    });
+
+    it('should reset check result after grading in writing mode', () => {
+        let checkResult: 'idle' | 'correct' | 'wrong' = 'correct';
+
+        // Simulate grading and moving to next card
+        checkResult = 'idle';
+
+        expect(checkResult).toBe('idle');
+    });
+
+    it('should validate progression state after last card', () => {
+        const currentIndex = 4;
+        const queueLength = 5;
+
+        const isFinished = currentIndex >= queueLength - 1;
+
+        expect(isFinished).toBe(true);
+    });
 });

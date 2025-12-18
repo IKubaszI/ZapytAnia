@@ -288,7 +288,7 @@ export const QuizPage: React.FC = () => {
             )}
 
             <div style={{ marginTop: 20, fontSize: 12, color: '#999' }}>
-                {quizType === 'writing' ? t('quiz.writingHint') : t('quiz.quizHint')}
+                {quizType === 'writing' ? t('quiz.writingHint') : (mode === 'srs' ? t('quiz.quizHint') : t('quiz.trainingHint'))}
             </div>
         </div>
     );

@@ -21,7 +21,7 @@ describe('profileRepository Integration Tests', () => {
 
     describe('Export/Import Full Profile', () => {
         it('should export and import complete profile data', async () => {
-            // ARRANGE - stwórz profil z danymi
+            // ARRANGE - create profile with data
             const profileId = await profileRepository.create('Export Test User');
             const deckId = await db.decks.add({
                 name: 'Test Deck',
@@ -47,7 +47,7 @@ describe('profileRepository Integration Tests', () => {
             // ACT - eksportuj dane
             const exportedJSON = await studyRepository.exportProfileData(profileId as number);
 
-            // ARRANGE - usuń wszystkie dane
+            // ARRANGE - delete all data
             await db.reviews.where({ profileId: profileId as number }).delete();
             await db.cards.where({ profileId: profileId as number }).delete();
             await db.decks.where({ profileId: profileId as number }).delete();
@@ -55,7 +55,7 @@ describe('profileRepository Integration Tests', () => {
             // ACT - importuj z powrotem
             await studyRepository.importProfileData(exportedJSON);
 
-            // ASSERT - sprawdź integralność
+            // ASSERT - check integrity
             const restoredProfile = await db.profiles.get(profileId as number);
             const restoredDecks = await db.decks.where({ profileId: profileId as number }).toArray();
             const restoredCards = await db.cards.where({ profileId: profileId as number }).toArray();
@@ -70,7 +70,7 @@ describe('profileRepository Integration Tests', () => {
 
     describe('Profile Switching and Data Isolation', () => {
         it('should isolate data between profiles', async () => {
-            // ARRANGE - stwórz 2 profile z danymi
+            // ARRANGE - create 2 profiles with data
             const profile1Id = await profileRepository.create('User 1');
             const profile2Id = await profileRepository.create('User 2');
 
@@ -108,14 +108,14 @@ describe('profileRepository Integration Tests', () => {
                 repetitions: 0,
             });
 
-            // ACT - pobierz dane dla każdego profilu
+            // ACT - get data for each profile
             const profile1Decks = await db.decks.where({ profileId: profile1Id as number }).toArray();
             const profile2Decks = await db.decks.where({ profileId: profile2Id as number }).toArray();
 
             const profile1Cards = await db.cards.where({ profileId: profile1Id as number }).toArray();
             const profile2Cards = await db.cards.where({ profileId: profile2Id as number }).toArray();
 
-            // ASSERT - sprawdź izolację
+            // ASSERT - check isolation
             expect(profile1Decks).toHaveLength(1);
             expect(profile1Decks[0].name).toBe('Profile 1 Deck');
 

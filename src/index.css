@@ -32,7 +32,13 @@ body.dark-mode {
   }
 }
 
-main, section, article, header, footer { display: block; }
+main,
+section,
+article,
+header,
+footer {
+  display: block;
+}
 
 /* 3D Flip Card */
 .flip-container {
@@ -41,23 +47,27 @@ main, section, article, header, footer { display: block; }
   min-height: 300px;
   margin-bottom: 20px;
 }
+
 .flipper {
   transition: 0.6s;
   transform-style: preserve-3d;
   position: relative;
   min-height: 300px;
 }
+
 .flip-container.flipped .flipper {
   transform: rotateY(180deg);
 }
-.front, .back {
+
+.front,
+.back {
   backface-visibility: hidden;
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: white; 
+  background: white;
   border-radius: 12px;
   border: 1px solid #f0f0f0;
   padding: 24px;
@@ -65,12 +75,35 @@ main, section, article, header, footer { display: block; }
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
+
+.front {
+  z-index: 2;
+  transform: rotateY(0deg);
+}
+
 .back {
+  z-index: 1;
   transform: rotateY(180deg);
 }
-body.dark-mode .front, body.dark-mode .back {
+
+.back>* {
+  opacity: 0;
+  visibility: hidden;
+  /* Instant hide when flipping back */
+  transition: opacity 0s 0s, visibility 0s 0s;
+}
+
+.flip-container.flipped .back>* {
+  opacity: 1;
+  visibility: visible;
+  /* Delayed show when flipping front */
+  transition: opacity 0s 0.2s, visibility 0s 0.2s;
+}
+
+body.dark-mode .front,
+body.dark-mode .back {
   background: #1f1f1f;
   border-color: #303030;
   color: rgba(255, 255, 255, 0.85);

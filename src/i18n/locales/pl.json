@@ -102,6 +102,7 @@
         "reverseMode": "Odwróć (Pol → Ang)",
         "writingHint": "Wpisz odpowiedź i naciśnij Enter.",
         "quizHint": "Spacja (Pokaż), 1/2/3 (Ocena)",
+        "trainingHint": "Spacja (Pokaż), 1 (Źle) / 2 (Dobrze)",
         "dictionary": "Słownik",
         "rateResult": "Jak oceniasz ten wynik?",
         "typo": "Literówka",
