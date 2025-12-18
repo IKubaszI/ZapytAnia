@@ -7,14 +7,12 @@ import { profileRepository } from '../../services/repositories/profileRepository
 import { calculateNextReview } from '../../domain/srs';
 import { Grade, type Card } from '../../domain/models';
 import Confetti from 'react-confetti';
-import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 
 const DAILY_GOAL = 20;
 
 export const QuizPage: React.FC = () => {
-    const { t } = useTranslation();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const deckId = searchParams.get('deck');
@@ -116,9 +114,9 @@ export const QuizPage: React.FC = () => {
             setTodayCount(prev => Math.max(0, prev - 1));
             setCanUndo(false);
             setPreviousCardState(null);
-            message.info(t('quiz.undo'));
+            message.info("Cofnięto.");
             window.dispatchEvent(new Event('zapytania:stats-changed'));
-        } catch (e) { message.error(t('common.error')); }
+        } catch (e) { message.error("Błąd cofania"); }
     };
 
     const speak = (text: string) => {
@@ -177,14 +175,14 @@ export const QuizPage: React.FC = () => {
     if (loading) return null;
 
     if (queue.length === 0 && !finished) {
-        if (mode === 'srs') return <Result icon={<SmileOutlined style={{ color: '#52c41a' }} />} title={t('quiz.noCards')} subTitle={t('quiz.comeBackTomorrow')} extra={[<Button type="primary" onClick={() => navigate('/')}>{t('common.back')}</Button>]} />;
-        return <Result title={t('quiz.empty')} extra={[<Button onClick={() => navigate('/')}>{t('common.back')}</Button>]} />;
+        if (mode === 'srs') return <Result icon={<SmileOutlined style={{ color: '#52c41a' }} />} title="Na dzisiaj koniec!" subTitle="Wróć jutro ;)" extra={[<Button type="primary" onClick={() => navigate('/')}>Wróć</Button>]} />;
+        return <Result title="Pusto." extra={[<Button onClick={() => navigate('/')}>Wróć</Button>]} />;
     }
 
     if (finished) return (
         <>
             <Confetti recycle={false} numberOfPieces={500} />
-            <Result status="success" title={t('quiz.finished')} subTitle={t('quiz.congratulations')} extra={[<Button type="primary" onClick={() => navigate('/stats')}>{t('nav.stats')}</Button>, <Button onClick={() => navigate('/')}>{t('common.back')}</Button>]} />
+            <Result status="success" title="Sesja zakończona!" extra={[<Button type="primary" onClick={() => navigate('/stats')}>Statystyki</Button>, <Button onClick={() => navigate('/')}>Wróć</Button>]} />
         </>
     );
 
@@ -198,9 +196,9 @@ export const QuizPage: React.FC = () => {
 
             <div style={{ marginBottom: 20 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-                    <Text type="secondary" strong>{t('quiz.dailyGoal')}: {todayCount} / {dailyGoal}</Text>
+                    <Text type="secondary" strong>Cel dzienny: {todayCount} / {dailyGoal}</Text>
                     <Space>
-                        <Tooltip title={t('quiz.reverseMode')}><Switch checkedChildren="Rev" unCheckedChildren="Std" checked={reverseMode} onChange={setReverseMode} /></Tooltip>
+                        <Tooltip title="Odwróć (Pol -> Ang)"><Switch checkedChildren="Rev" unCheckedChildren="Std" checked={reverseMode} onChange={setReverseMode} /></Tooltip>
                         <Button icon={<UndoOutlined />} disabled={!canUndo} onClick={handleUndo} />
                     </Space>
                 </div>
@@ -220,7 +218,7 @@ export const QuizPage: React.FC = () => {
                             <Input
                                 ref={inputRef}
                                 size="large"
-                                placeholder={t('quiz.typeAnswer')}
+                                placeholder="Wpisz odpowiedź..."
                                 value={userAnswer}
                                 onChange={e => setUserAnswer(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && checkWrittenAnswer()}
@@ -230,24 +228,24 @@ export const QuizPage: React.FC = () => {
                         ) : (
                             <div>
                                 {checkResult === 'correct' ? (
-                                    <Alert message={<span style={{ fontSize: 18 }}>{t('quiz.correct')} <b>{answer}</b></span>} type="success" showIcon icon={<CheckCircleFilled />} />
+                                    <Alert message={<span style={{ fontSize: 18 }}>Dobrze! <b>{answer}</b></span>} type="success" showIcon icon={<CheckCircleFilled />} />
                                 ) : (
-                                    <Alert message={<span style={{ fontSize: 16 }}>{t('quiz.incorrect')} {t('quiz.yourAnswer')}: <s>{userAnswer}</s></span>} description={<span style={{ fontSize: 18 }}>{t('quiz.correctAnswer')}: <b>{answer}</b></span>} type="error" showIcon icon={<CloseCircleFilled />} />
+                                    <Alert message={<span style={{ fontSize: 16 }}>Błąd. Twoja odp: <s>{userAnswer}</s></span>} description={<span style={{ fontSize: 18 }}>Poprawnie: <b>{answer}</b></span>} type="error" showIcon icon={<CloseCircleFilled />} />
                                 )}
                             </div>
                         )}
                     </AntCard>
                     {isFlipped && (
                         <div style={{ marginTop: 10 }}>
-                            <Text type="secondary" style={{ display: 'block', marginBottom: 10 }}>{t('quiz.rateResult')}</Text>
+                            <Text type="secondary" style={{ display: 'block', marginBottom: 10 }}>Jak oceniasz ten wynik?</Text>
                             <Row gutter={16}>
-                                <Col span={8}><Button danger block size="large" onClick={() => handleGrade(Grade.Again)}>{t('quiz.wrong')} (1)</Button></Col>
-                                <Col span={8}><Button block size="large" onClick={() => handleGrade(Grade.Hard)}>{t('quiz.typo')} (2)</Button></Col>
-                                <Col span={8}><Button type="primary" block size="large" onClick={() => handleGrade(Grade.Good)} style={checkResult === 'correct' ? { boxShadow: '0 0 10px #52c41a' } : {}}>{t('quiz.perfect')} (3)</Button></Col>
+                                <Col span={8}><Button danger block size="large" onClick={() => handleGrade(Grade.Again)}>Źle (1)</Button></Col>
+                                <Col span={8}><Button block size="large" onClick={() => handleGrade(Grade.Hard)}>Trudno (2)</Button></Col>
+                                <Col span={8}><Button type="primary" block size="large" onClick={() => handleGrade(Grade.Good)} style={checkResult === 'correct' ? { boxShadow: '0 0 10px #52c41a' } : {}}>Dobrze (3)</Button></Col>
                             </Row>
                         </div>
                     )}
-                    {!isFlipped && <Button type="primary" block size="large" onClick={checkWrittenAnswer}>{t('quiz.check')}</Button>}
+                    {!isFlipped && <Button type="primary" block size="large" onClick={checkWrittenAnswer}>Sprawdź</Button>}
                 </div>
             ) : (
                 <>
@@ -259,26 +257,26 @@ export const QuizPage: React.FC = () => {
                             </div>
                             <div className="back">
                                 <div style={{ fontSize: 24, color: '#52c41a', fontWeight: 'bold' }}>{answer}</div>
-                                <div style={{ marginTop: 20 }}><Button size="small" icon={<TranslationOutlined />} onClick={() => openDictionary(answer)}>{t('quiz.dictionary')}</Button></div>
+                                <div style={{ marginTop: 20 }}><Button size="small" icon={<TranslationOutlined />} onClick={() => openDictionary(answer)}>Słownik</Button></div>
                             </div>
                         </div>
                     </div>
 
                     <div style={{ marginTop: 30 }}>
                         {!isFlipped ? (
-                            <Button type="primary" size="large" block onClick={() => setIsFlipped(true)}>{t('quiz.showKey')}</Button>
+                            <Button type="primary" size="large" block onClick={() => setIsFlipped(true)}>Pokaż (Spacja)</Button>
                         ) : (
                             <Row gutter={16}>
                                 {mode === 'srs' ? (
                                     <>
-                                        <Col span={8}><Button danger block size="large" onClick={() => handleGrade(Grade.Again)}>1</Button></Col>
-                                        <Col span={8}><Button block size="large" onClick={() => handleGrade(Grade.Hard)}>2</Button></Col>
-                                        <Col span={8}><Button type="primary" block size="large" onClick={() => handleGrade(Grade.Good)}>3</Button></Col>
+                                        <Col span={8}><Button danger block size="large" onClick={() => handleGrade(Grade.Again)}>Źle (1)</Button></Col>
+                                        <Col span={8}><Button block size="large" onClick={() => handleGrade(Grade.Hard)}>Trudno (2)</Button></Col>
+                                        <Col span={8}><Button type="primary" block size="large" onClick={() => handleGrade(Grade.Good)}>Dobrze (3)</Button></Col>
                                     </>
                                 ) : (
                                     <>
-                                        <Col span={12}><Button danger block size="large" onClick={() => handleGrade(0)}>{t('quiz.wrong')}</Button></Col>
-                                        <Col span={12}><Button type="primary" block size="large" onClick={() => handleGrade(5)}>{t('quiz.good')}</Button></Col>
+                                        <Col span={12}><Button danger block size="large" onClick={() => handleGrade(0)}>Źle (1)</Button></Col>
+                                        <Col span={12}><Button type="primary" block size="large" onClick={() => handleGrade(5)}>Dobrze (2)</Button></Col>
                                     </>
                                 )}
                             </Row>
@@ -288,7 +286,7 @@ export const QuizPage: React.FC = () => {
             )}
 
             <div style={{ marginTop: 20, fontSize: 12, color: '#999' }}>
-                {quizType === 'writing' ? t('quiz.writingHint') : t('quiz.quizHint')}
+                {quizType === 'writing' ? "Wpisz odpowiedź i naciśnij Enter." : "Spacja (Obróć), 1/2/3 (Ocena), Enter (Łatwizna)"}
             </div>
         </div>
     );
