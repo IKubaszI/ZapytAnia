@@ -5,26 +5,41 @@ const CURRENT_PROFILE_KEY = 'zapytania.currentProfileId';
 
 export const profileRepository = {
   getAll: async () => db.profiles.orderBy('lastUsedAt').reverse().toArray(),
-  
+
   getById: async (id: number) => db.profiles.get(id),
-  
+
   create: async (name: string, avatarUrl?: string) => {
     // 1. Walidacja unikalności nazwy (case-insensitive)
-    const existing = await db.profiles
-      .filter(p => p.name.toLowerCase() === name.trim().toLowerCase())
-      .first();
+    try {
+      const existing = await db.profiles
+        .filter(p => p.name.toLowerCase() === name.trim().toLowerCase())
+        .first();
 
-    if (existing) {
-      throw new Error("PROFILE_EXISTS");
+      if (existing) {
+        console.warn(`Profile creation failed: '${name}' already exists.`);
+        throw new Error("PROFILE_EXISTS");
+      }
+
+      const id = await db.profiles.add({
+        name: name.trim(),
+        avatarUrl,
+        createdAt: Date.now(),
+        lastUsedAt: Date.now(),
+      });
+      console.log(`Profile '${name}' created successfully with ID: ${id}`);
+      return id;
+    } catch (error: any) {
+      console.error("Dexie error in profileRepository.create:", error);
+      if (error && typeof error === 'object') {
+        console.error("Dexie Error Details:", {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+          inner: error.inner
+        });
+      }
+      throw error;
     }
-
-    const id = await db.profiles.add({
-      name: name.trim(),
-      avatarUrl,
-      createdAt: Date.now(),
-      lastUsedAt: Date.now(),
-    });
-    return id;
   },
 
   update: async (id: number, changes: Partial<Profile>) => {
@@ -32,7 +47,7 @@ export const profileRepository = {
       const existing = await db.profiles
         .filter(p => p.name.toLowerCase() === changes.name!.trim().toLowerCase() && p.id !== id)
         .first();
-      
+
       if (existing) {
         throw new Error("PROFILE_EXISTS");
       }

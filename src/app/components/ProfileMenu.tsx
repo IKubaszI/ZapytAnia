@@ -68,6 +68,7 @@ export const ProfileMenu: React.FC<Props> = ({ profiles, currentProfile, onProfi
       setEditorOpen(false);
       setIsCreatingNew(false);
     } catch (error: any) {
+      console.error("Profile save error:", error);
       if (error.message === "PROFILE_EXISTS") messageApi.error(t('profile.exists'));
       else messageApi.error(t('profile.errorSave'));
     }
