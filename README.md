@@ -86,10 +86,10 @@ npm test
 
 | **ID** | TC005 |
 |--------|-------|
-| **Tytuł** | Cofanie ostatniej oceny Ctrl+Z |
+| **Tytuł** | Cofanie ostatniej fiski |
 | **Warunki początkowe** | Przynajmniej jedna karta została oceniona, widoczna kolejna karta |
 | **Kroki testowe** | 1. Naciśnij **Ctrl+Z** (lub Cmd+Z na Mac)<br>2. Sprawdź czy wrócono do poprzedniej karty<br>3. Sprawdź licznik postępu |
-| **Oczekiwany rezultat** | Poprzednia karta pojawia się z odwróconą stroną, licznik się cofa, pojawia się komunikat "Cofnięto" |
+| **Oczekiwany rezultat** | Poprzednia karta pojawia się z odwróconą stroną, licznik się cofa|
 
 ---
 
@@ -98,7 +98,7 @@ npm test
 | **ID** | TC006 |
 |--------|-------|
 | **Tytuł** | Wpisywanie poprawnej odpowiedzi w trybie Writing |
-| **Warunki początkowe** | Quiz uruchomiony w trybie Writing (?type=writing), widoczne pole tekstowe |
+| **Warunki początkowe** | Quiz uruchomiony w trybie Writing, widoczne pole tekstowe |
 | **Kroki testowe** | 1. Przeczytaj pytanie<br>2. Wpisz **poprawną** odpowiedź w pole tekstowe<br>3. Naciśnij **Enter**<br>4. Sprawdź komunikat |
 | **Oczekiwany rezultat** | Wyświetla się zielony alert "Dobrze! [odpowiedź]" z ikoną CheckCircle, słyszalny dźwięk TTS z odpowiedzią |
 
