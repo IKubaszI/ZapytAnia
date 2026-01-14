@@ -243,7 +243,7 @@ describe('studyRepository Integration Tests', () => {
                 studyRepository.importCardsSmart(testDeckId, testProfileId, batch1),
                 studyRepository.importCardsSmart(testDeckId, testProfileId, batch2),
                 studyRepository.importCardsSmart(testDeckId, testProfileId, batch3),
-                await db.cards.bulkAdd([
+                db.cards.bulkAdd([
                     { deckId: testDeckId, profileId: testProfileId, front: 'card1', back: 'answer1', nextReviewAt: pastTime, ease: 2.5, interval: 1, repetitions: 0 },
                     { deckId: testDeckId, profileId: testProfileId, front: 'card2', back: 'answer2', nextReviewAt: pastTime, ease: 2.5, interval: 1, repetitions: 0 },
                     { deckId: testDeckId, profileId: testProfileId, front: 'card3', back: 'answer3', nextReviewAt: futureTime, ease: 2.5, interval: 1, repetitions: 0 },
