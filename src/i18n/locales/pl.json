@@ -106,16 +106,12 @@
         "dictionary": "Słownik",
         "rateResult": "Jak oceniasz ten wynik?",
         "typo": "Literówka",
-<<<<<<< HEAD
         "perfect": "Idealnie",
         "srs": {
             "again": "Nie umiem :( (1) ",
             "hard": "Do powtórki (2) ",
             "good": " Idealnie! (3) "
         }
-=======
-        "perfect": "Idealnie"
->>>>>>> 8d763e573fdbd71622511f4fb50c75526feec3d9
     },
     "stats": {
         "title": "Statystyki",

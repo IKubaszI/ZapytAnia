@@ -5,7 +5,6 @@ const CURRENT_PROFILE_KEY = 'zapytania.currentProfileId';
 
 export const profileRepository = {
   getAll: async () => db.profiles.orderBy('lastUsedAt').reverse().toArray(),
-<<<<<<< HEAD
 
   getById: async (id: number) => db.profiles.get(id),
 
@@ -41,28 +40,6 @@ export const profileRepository = {
       }
       throw error;
     }
-=======
-  
-  getById: async (id: number) => db.profiles.get(id),
-  
-  create: async (name: string, avatarUrl?: string) => {
-    // 1. Walidacja unikalności nazwy (case-insensitive)
-    const existing = await db.profiles
-      .filter(p => p.name.toLowerCase() === name.trim().toLowerCase())
-      .first();
-
-    if (existing) {
-      throw new Error("PROFILE_EXISTS");
-    }
-
-    const id = await db.profiles.add({
-      name: name.trim(),
-      avatarUrl,
-      createdAt: Date.now(),
-      lastUsedAt: Date.now(),
-    });
-    return id;
->>>>>>> 8d763e573fdbd71622511f4fb50c75526feec3d9
   },
 
   update: async (id: number, changes: Partial<Profile>) => {
@@ -70,11 +47,7 @@ export const profileRepository = {
       const existing = await db.profiles
         .filter(p => p.name.toLowerCase() === changes.name!.trim().toLowerCase() && p.id !== id)
         .first();
-<<<<<<< HEAD
 
-=======
-      
->>>>>>> 8d763e573fdbd71622511f4fb50c75526feec3d9
       if (existing) {
         throw new Error("PROFILE_EXISTS");
       }

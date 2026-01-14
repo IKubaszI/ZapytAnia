@@ -68,10 +68,7 @@ export const ProfileMenu: React.FC<Props> = ({ profiles, currentProfile, onProfi
       setEditorOpen(false);
       setIsCreatingNew(false);
     } catch (error: any) {
-<<<<<<< HEAD
       console.error("Profile save error:", error);
-=======
->>>>>>> 8d763e573fdbd71622511f4fb50c75526feec3d9
       if (error.message === "PROFILE_EXISTS") messageApi.error(t('profile.exists'));
       else messageApi.error(t('profile.errorSave'));
     }
@@ -147,11 +144,7 @@ export const ProfileMenu: React.FC<Props> = ({ profiles, currentProfile, onProfi
         <Button type="primary" ghost icon={<PlusOutlined />} onClick={openCreator}>{t('profile.loginCreate')}</Button>
       )}
 
-<<<<<<< HEAD
-      <Modal open={editorOpen} onCancel={() => setEditorOpen(false)} footer={null} centered destroyOnHidden={true} width={400}>
-=======
       <Modal open={editorOpen} onCancel={() => setEditorOpen(false)} footer={null} centered destroyOnClose width={400}>
->>>>>>> 8d763e573fdbd71622511f4fb50c75526feec3d9
         <div style={{ textAlign: "center", padding: "24px 8px" }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
             {!isCreatingNew && currentProfile ? (
