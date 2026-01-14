@@ -106,12 +106,7 @@
         "dictionary": "Dictionary",
         "rateResult": "How do you rate this result?",
         "typo": "Typo",
-        "perfect": "Perfect",
-        "srs": {
-            "again": "Bad :( (1) ",
-            "hard": "repeat (2) ",
-            "good": " Perfect! (3) "
-        }
+        "perfect": "Perfect"
     },
     "stats": {
         "title": "Statistics",

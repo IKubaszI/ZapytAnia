@@ -6,7 +6,6 @@ import {
   BarChartOutlined, MenuOutlined
 } from '@ant-design/icons';
 import { profileRepository } from '../../services/repositories/profileRepository';
-import { db } from '../../services/db';
 import type { Profile } from '../../domain/models';
 import { ProfileMenu } from './ProfileMenu';
 import { LanguageSwitcher } from '../../components/LanguageSwitcher';
@@ -38,72 +37,26 @@ export const Nav: React.FC<NavProps> = ({ isDarkMode, toggleTheme }) => {
   const location = useLocation();
 
   const ensureGuestAndLoad = async () => {
-    try {
-      const all = await profileRepository.getAll();
-      setProfiles(all);
-      let currentId = profileRepository.getActiveProfileId();
+    const all = await profileRepository.getAll();
+    setProfiles(all);
+    let currentId = profileRepository.getActiveProfileId();
 
-      if (!currentId) {
-        let guest = all.find(p => p.name === "Gość");
-        if (!guest) {
-          console.log("No guest profile found, creating one...");
-          try {
-            const newId = await profileRepository.create("Gość");
-            currentId = newId as number;
-            console.log("Guest profile created with ID:", newId);
-          } catch (createError) {
-            console.error("Failed to create Guest profile:", createError);
-            // Fallback: try to find any profile
-            if (all.length > 0) {
-              currentId = all[0].id!;
-              console.log("Fallback to first available profile:", currentId);
-            }
-          }
-        } else {
-          currentId = guest.id!;
-        }
-        if (currentId) await profileRepository.setActiveProfileId(currentId);
+    if (!currentId) {
+      let guest = all.find(p => p.name === "Gość");
+      if (!guest) {
+        const newId = await profileRepository.create("Gość");
+        currentId = newId as number;
+      } else {
+        currentId = guest.id!;
       }
-
-      const activeProfile = currentId
-        ? all.find(p => p.id === currentId) || (await profileRepository.getById(currentId))
-        : null;
-      setCurrentProfile(activeProfile || null);
-
-      // Double check if profiles list needs update
-      const freshAll = await profileRepository.getAll();
-      if (all.length !== freshAll.length) setProfiles(freshAll);
-
-    } catch (error: any) {
-      console.error("Critical error in ensureGuestAndLoad:", error);
-
-      // Check for critical DB errors that require a reset
-      const isDatabaseError = error.name === 'DatabaseClosedError' ||
-        error.name === 'DataError' ||
-        (error.message && error.message.includes('UpgradeError'));
-
-      if (isDatabaseError) {
-        const resetKey = 'zapytania.db_reset_attempt';
-        const lastReset = localStorage.getItem(resetKey);
-        const now = Date.now();
-
-        // Prevent infinite loops: only reset once every 10 seconds
-        if (!lastReset || (now - parseInt(lastReset)) > 10000) {
-          console.warn("Detected corrupted database. Attempting to reset...");
-          localStorage.setItem(resetKey, now.toString());
-          try {
-            await db.delete();
-            console.log("Database deleted successfully. Reloading...");
-            window.location.reload();
-          } catch (deleteError) {
-            console.error("Failed to delete database:", deleteError);
-            alert("Critical Error: Database is corrupted and could not be reset automatically. Please clear your browser site data.");
-          }
-        } else {
-          console.error("Database reset loop detected. Please clear site data manually.");
-        }
-      }
+      if (currentId) await profileRepository.setActiveProfileId(currentId);
     }
+
+    const activeProfile = currentId
+      ? all.find(p => p.id === currentId) || (await profileRepository.getById(currentId))
+      : null;
+    setCurrentProfile(activeProfile || null);
+    if (all.length !== (await profileRepository.getAll()).length) setProfiles(await profileRepository.getAll());
   };
 
   useEffect(() => {
@@ -184,7 +137,7 @@ export const Nav: React.FC<NavProps> = ({ isDarkMode, toggleTheme }) => {
         placement="right"
         onClose={() => setDrawerVisible(false)}
         open={drawerVisible}
-        styles={{ body: { padding: 0 } }}
+        bodyStyle={{ padding: 0 }}
       >
         <Menu
           mode="inline"

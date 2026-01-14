@@ -9,7 +9,7 @@ class ZapytaniaDB extends Dexie {
 
   constructor() {
     super('ZapytaniaDB_v2');
-    this.version(2).stores({
+    this.version(1).stores({
       profiles: '++id, name, lastUsedAt',
       decks: '++id, profileId, name',
       cards: '++id, deckId, profileId, nextReviewAt',

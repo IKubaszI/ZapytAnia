@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
-    "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "antd": "^5.29.1",
     "dayjs": "^1.11.13",
     "dexie": "^4.2.1",
