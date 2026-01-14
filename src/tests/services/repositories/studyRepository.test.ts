@@ -239,16 +239,16 @@ describe('studyRepository Integration Tests', () => {
             ];
 
             // ACT - perform concurrent imports
-            await Promise.all([
-                studyRepository.importCardsSmart(testDeckId, testProfileId, batch1),
-                studyRepository.importCardsSmart(testDeckId, testProfileId, batch2),
-                studyRepository.importCardsSmart(testDeckId, testProfileId, batch3),
-                db.cards.bulkAdd([
-                    { deckId: testDeckId, profileId: testProfileId, front: 'card1', back: 'answer1', nextReviewAt: pastTime, ease: 2.5, interval: 1, repetitions: 0 },
-                    { deckId: testDeckId, profileId: testProfileId, front: 'card2', back: 'answer2', nextReviewAt: pastTime, ease: 2.5, interval: 1, repetitions: 0 },
-                    { deckId: testDeckId, profileId: testProfileId, front: 'card3', back: 'answer3', nextReviewAt: futureTime, ease: 2.5, interval: 1, repetitions: 0 },
-                ]),
+            const p1 = studyRepository.importCardsSmart(testDeckId, testProfileId, batch1);
+            const p2 = studyRepository.importCardsSmart(testDeckId, testProfileId, batch2);
+            const p3 = studyRepository.importCardsSmart(testDeckId, testProfileId, batch3);
+            const p4 = db.cards.bulkAdd([
+                { deckId: testDeckId, profileId: testProfileId, front: 'card1', back: 'answer1', nextReviewAt: pastTime, ease: 2.5, interval: 1, repetitions: 0 },
+                { deckId: testDeckId, profileId: testProfileId, front: 'card2', back: 'answer2', nextReviewAt: pastTime, ease: 2.5, interval: 1, repetitions: 0 },
+                { deckId: testDeckId, profileId: testProfileId, front: 'card3', back: 'answer3', nextReviewAt: futureTime, ease: 2.5, interval: 1, repetitions: 0 }
             ]);
+
+            await Promise.all([p1, p2, p3, p4]);
 
             const dueCards = await studyRepository.getDueCards(testDeckId, now);
 
