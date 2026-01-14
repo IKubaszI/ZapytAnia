@@ -1,7 +1,6 @@
 
 # Testowanie i Jakość Oprogramowania
-**Aplikacja jest hostowana na platformie GitHub dostępnym pod adresem:**
-### https://ikubaszi.github.io/ZapytAnia/#/
+### Aplikacja jest hostowana na platformie GitHub dostępnym pod adresem: https://ikubaszi.github.io/ZapytAnia/#/
 
 **Autor:** Jakub Szaraj
 
