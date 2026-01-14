@@ -14,6 +14,8 @@
 
 **Uruchomienie projektu:** `npm run dev`
 
+**Przykładowe pliki z fiszkami możesz naleźć w folderze** `example_word_txt`
+
 **Technologie użyte w projekcie:** React 19, TypeScript, Vite, Ant Design, Dexie.js (IndexedDB), Vitest (testy), React Router.
 
 ## Dokumentacja API
