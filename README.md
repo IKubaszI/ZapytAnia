@@ -14,7 +14,7 @@
 2. Przeglądarka poprosi o zezwolenie na zapisyanie i nie kasowanie ich. aby nie kasować całego postępu w aplikacji. 
 4. Nieliczne przeglądarki (takie jak np DuckDuckGo) mogą same usuwać pamięć podręczną i IndexedDB. Jeżeli tak się stanie należy dodać wyjątek do aplikacji by funkcjonowała prawidłowo
 
-
+**Instalacja wymaganych pakietów:** `npm i`
 
 **Uruchomienie projektu:** `npm run dev`
 
