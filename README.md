@@ -1,25 +1,37 @@
 
+
 # Testowanie i Jakość Oprogramowania
-### Aplikacja jest hostowana na platformie GitHub dostępnym pod adresem: https://ikubaszi.github.io/ZapytAnia/#/
+### Aplikacja jest hostowana na platformie [GitHub](https://ikubaszi.github.io/ZapytAnia/#/)
 
 **Autor:** Jakub Szaraj
 
 **Temat projektu:** Aplikacja do nauki języków obcych (Fiszki) z algorytmem SRS
 
-**Opis projektu:** Jest to prosta aplikacja internetowa kompatybilna z komputerami jak i z telefonami umożliwiająca tworzenie, edycję i naukę zestawów fiszek importowanych z pliku txt lub własnoręcznie wprowadzanych. Aplikacja Wykorzystuje prosty algorytm SRS (Spaced Repetition System) do optymalizacji procesu zapamiętywania. Aplikacja działa całkowicie w przeglądarce poprzez IndexedDB. Baze danych można pobrać w formacie .json aby móc przenieść swój postęp na inne urządzenie. 
+**Opis projektu:** Prosta aplikacja internetowa kompatybilna z komputerami jak i z telefonami umożliwiająca tworzenie, edycję i naukę zestawów fiszek importowanych z pliku txt lub własnoręcznie wprowadzanych. Wykorzystuje prosty algorytm SRS (Spaced Repetition System) do optymalizacji procesu zapamiętywania. Działa całkowicie w przeglądarce poprzez IndexedDB. Umożliwia pobranie bazy danych w formacie .json by przenosić postępy między urządzeniami
 
-**UWAGI** Należy pamiętać że baza danych została zaimplementowana poprzez IndexedDB. Co sprawia że wszyskie dane są przechowywane w przeglądarce. Przeglądarka poprosi o zezwolenie na zapisyanie i nie kasowanie ich. aby nie kasować całego postępu w aplikacji. Przeglądarki takie jak DuckDuckGo mogą same usuwać cash i dane z IndexedDB w zależnosci od ich ustawienia. W takim przypadku należy dodać wyjątek do aplikacji aby nie kasować danych użytkownika, lub użyć innej przeglądarki.
+**UWAGA** 
+1. Należy pamiętać że baza danych została zaimplementowana poprzez IndexedDB. Co sprawia że wszyskie dane są przechowywane w przeglądarce. 
+2. Przeglądarka poprosi o zezwolenie na zapisyanie i nie kasowanie ich. aby nie kasować całego postępu w aplikacji. 
+4. Nieliczne przeglądarki (takie jak np DuckDuckGo) mogą same usuwać pamięć podręczną i IndexedDB. Jeżeli tak się stanie należy dodać wyjątek do aplikacji by funkcjonowała prawidłowo
 
 
 
 **Uruchomienie projektu:** `npm run dev`
 
-**Przykładowe pliki z fiszkami możesz naleźć w folderze** `example_word_txt`
+**Przykładowe pliki z fiszkami** `example_word_txt`
 
-**Technologie użyte w projekcie:** React 19, TypeScript, Vite, Ant Design, Dexie.js (IndexedDB), Vitest (testy), React Router.
+**Technologie użyte w projekcie:** 
+- React 19
+- React Router
+- TypeScript
+- Vite
+- Ant Design
+- Dexie.js (IndexedDB)
+- Vitest (testy)
 
 ## Dokumentacja API
 Aplikacja jest typu Client-Side (Frontend Only) i nie posiada własnego backendowego API REST. Cała logika biznesowa oraz baza danych znajdują się po stronie klienta (w przeglądarce).
+
 ## Testy
 
 Wszystkie testy znajdują się w katalogu `src/tests`.
@@ -38,7 +50,9 @@ npm test
 
 -----------------------------------------------------------------------------------------------------
 
-## TC001 - Wyświetlanie pytania w trybie standardowym
+## Test case'y
+
+### TC001 - Wyświetlanie pytania w trybie standardowym
 
 | **ID** | TC001 |
 |--------|-------|
@@ -64,7 +78,7 @@ npm test
 
 | **ID** | TC003 |
 |--------|-------|
-| **Tytuł** | Ocenianie wiedzy klawiszami 1/2/3 |
+| **Tytuł** | Ocenianie wiedzy klawiszami na klawiaturze 1/2/3 |
 | **Warunki początkowe** | Karta odwrócona, widoczna odpowiedź, tryb SRS |
 | **Kroki testowe** | 1. Naciśnij klawisz **"3"** (Dobrze)<br>2. Sprawdź czy pojawia się następna karta<br>3. Sprawdź postęp w pasku |
 | **Oczekiwany rezultat** | Następna karta pojawia się automatycznie, pasek postępu aktualizuje się, licznik "Fiszka: X / Y" zwiększa się |
@@ -86,10 +100,10 @@ npm test
 
 | **ID** | TC005 |
 |--------|-------|
-| **Tytuł** | Cofanie ostatniej fiski |
+| **Tytuł** | Cofanie ostatniej oceny Ctrl+Z |
 | **Warunki początkowe** | Przynajmniej jedna karta została oceniona, widoczna kolejna karta |
 | **Kroki testowe** | 1. Naciśnij **Ctrl+Z** (lub Cmd+Z na Mac)<br>2. Sprawdź czy wrócono do poprzedniej karty<br>3. Sprawdź licznik postępu |
-| **Oczekiwany rezultat** | Poprzednia karta pojawia się z odwróconą stroną, licznik się cofa|
+| **Oczekiwany rezultat** | Poprzednia karta pojawia się z odwróconą stroną, licznik się cofa, pojawia się komunikat "Cofnięto" |
 
 ---
 
@@ -98,7 +112,7 @@ npm test
 | **ID** | TC006 |
 |--------|-------|
 | **Tytuł** | Wpisywanie poprawnej odpowiedzi w trybie Writing |
-| **Warunki początkowe** | Quiz uruchomiony w trybie Writing, widoczne pole tekstowe |
+| **Warunki początkowe** | Quiz uruchomiony w trybie Writing (?type=writing), widoczne pole tekstowe |
 | **Kroki testowe** | 1. Przeczytaj pytanie<br>2. Wpisz **poprawną** odpowiedź w pole tekstowe<br>3. Naciśnij **Enter**<br>4. Sprawdź komunikat |
 | **Oczekiwany rezultat** | Wyświetla się zielony alert "Dobrze! [odpowiedź]" z ikoną CheckCircle, słyszalny dźwięk TTS z odpowiedzią |
 
@@ -200,3 +214,5 @@ npm test
 | **Warunki początkowe** | Tryb SRS, wszystkie karty przerobione na dzisiaj (0 due cards) |
 | **Kroki testowe** | 1. Przejdź do quizu w trybie SRS<br>2. Sprawdź wyświetlony komunikat |
 | **Oczekiwany rezultat** | Wyświetla ikonę uśmiechu, tekst "Na dzisiaj koniec!", "Wróć jutro ;)", przycisk "Wróć" |
+
+[@Jakub Szaraj - 2026](https://github.com/IKubaszI)
