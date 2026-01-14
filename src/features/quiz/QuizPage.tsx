@@ -271,9 +271,15 @@ export const QuizPage: React.FC = () => {
                             <Row gutter={16}>
                                 {mode === 'srs' ? (
                                     <>
+<<<<<<< HEAD
                                         <Col span={8}><Button danger block size="large" onClick={() => handleGrade(Grade.Again)}>{t('quiz.srs.again')}</Button></Col>
                                         <Col span={8}><Button block size="large" onClick={() => handleGrade(Grade.Hard)}>{t('quiz.srs.hard')}</Button></Col>
                                         <Col span={8}><Button type="primary" block size="large" onClick={() => handleGrade(Grade.Good)}>{t('quiz.srs.good')}</Button></Col>
+=======
+                                        <Col span={8}><Button danger block size="large" onClick={() => handleGrade(Grade.Again)}>1</Button></Col>
+                                        <Col span={8}><Button block size="large" onClick={() => handleGrade(Grade.Hard)}>2</Button></Col>
+                                        <Col span={8}><Button type="primary" block size="large" onClick={() => handleGrade(Grade.Good)}>3</Button></Col>
+>>>>>>> 8d763e573fdbd71622511f4fb50c75526feec3d9
                                     </>
                                 ) : (
                                     <>

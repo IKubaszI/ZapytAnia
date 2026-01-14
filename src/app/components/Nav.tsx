@@ -6,7 +6,10 @@ import {
   BarChartOutlined, MenuOutlined
 } from '@ant-design/icons';
 import { profileRepository } from '../../services/repositories/profileRepository';
+<<<<<<< HEAD
 import { db } from '../../services/db';
+=======
+>>>>>>> 8d763e573fdbd71622511f4fb50c75526feec3d9
 import type { Profile } from '../../domain/models';
 import { ProfileMenu } from './ProfileMenu';
 import { LanguageSwitcher } from '../../components/LanguageSwitcher';
@@ -38,6 +41,7 @@ export const Nav: React.FC<NavProps> = ({ isDarkMode, toggleTheme }) => {
   const location = useLocation();
 
   const ensureGuestAndLoad = async () => {
+<<<<<<< HEAD
     try {
       const all = await profileRepository.getAll();
       setProfiles(all);
@@ -104,6 +108,28 @@ export const Nav: React.FC<NavProps> = ({ isDarkMode, toggleTheme }) => {
         }
       }
     }
+=======
+    const all = await profileRepository.getAll();
+    setProfiles(all);
+    let currentId = profileRepository.getActiveProfileId();
+
+    if (!currentId) {
+      let guest = all.find(p => p.name === "Gość");
+      if (!guest) {
+        const newId = await profileRepository.create("Gość");
+        currentId = newId as number;
+      } else {
+        currentId = guest.id!;
+      }
+      if (currentId) await profileRepository.setActiveProfileId(currentId);
+    }
+
+    const activeProfile = currentId
+      ? all.find(p => p.id === currentId) || (await profileRepository.getById(currentId))
+      : null;
+    setCurrentProfile(activeProfile || null);
+    if (all.length !== (await profileRepository.getAll()).length) setProfiles(await profileRepository.getAll());
+>>>>>>> 8d763e573fdbd71622511f4fb50c75526feec3d9
   };
 
   useEffect(() => {
@@ -184,7 +210,11 @@ export const Nav: React.FC<NavProps> = ({ isDarkMode, toggleTheme }) => {
         placement="right"
         onClose={() => setDrawerVisible(false)}
         open={drawerVisible}
+<<<<<<< HEAD
         styles={{ body: { padding: 0 } }}
+=======
+        bodyStyle={{ padding: 0 }}
+>>>>>>> 8d763e573fdbd71622511f4fb50c75526feec3d9
       >
         <Menu
           mode="inline"

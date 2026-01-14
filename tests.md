@@ -1,37 +1,8 @@
-<<<<<<< HEAD
-# Testowanie i Jakość Oprogramowania
-# Aplikacja została zchostowana na platformie GitHub dostępnym pod adresem:https://ikubaszi.github.io/ZapytAnia/#/
+# Przypadki Testowe - QuizPage
 
+Testy manualne dla strony Quiz (QuizPage) w aplikacji Zapytania.
 
-**Autor:** Jakub Szaraj
-**Temat projektu:** Aplikacja do nauki języków obcych (Fiszki) z algorytmem SRS
-**Opis projektu:** Jest to prosta aplikacja internetowa kompatybilna z komputerami jak i z telefonami umożliwiająca tworzenie, edycję i naukę zestawów fiszek importowanych z pliku txt lub własnoręcznie wprowadzanych. Aplikacja Wykorzystuje prosty algorytm SRS (Spaced Repetition System) do optymalizacji procesu zapamiętywania. Aplikacja działa całkowicie w przeglądarce poprzez IndexedDB. Baze danych można pobrać w formacie .json aby móc przenieść swój postęp na inne urządzenie. 
-**UWAGI** Należy pamiętać że baza danych została zaimplementowana poprzez IndexedDB. Co sprawia że wszyskie dane są przechowywane w przeglądarce. Przeglądarka poprosi o zezwolenie na zapisyanie i nie kasowanie ich. aby nie kasować całego postępu w aplikacji. Przeglądarki takie jak DuckDuckGo mogą same usuwać cash i dane z IndexedDB w zależnosci od ich ustawienia. W takim przypadku należy dodać wyjątek do aplikacji aby nie kasować danych użytkownika, lub użyć innej przeglądarki.
-
-
-
-**Uruchomienie projektu:** `npm run dev`
-**Technologie użyte w projekcie:** React 19, TypeScript, Vite, Ant Design, Dexie.js (IndexedDB), Vitest (testy), React Router.
-
-## Dokumentacja API
-Aplikacja jest typu Client-Side (Frontend Only) i nie posiada własnego backendowego API REST. Cała logika biznesowa oraz baza danych znajdują się po stronie klienta (w przeglądarce).
-## Testy
-
-Wszystkie testy znajdują się w katalogu `src/tests`.
-
-### Uruchamianie testów
-Aby uruchomić wszystkie testy, użyj komendy:
-```bash
-npm test
-```
-
-### Struktura testów
-- `src/tests/features`: Testy integracyjne i jednostkowe dla funkcjonalności (Decks, Quiz, Stats).
-- `src/tests/services`: Testy serwisów (np. repozytoria).
-- `src/tests/domain`: Testy jednostkowe logiki domenowej (algorytm SRS, parsery).
-- `src/tests/smoke.test.ts`: Podstawowy test sprawdzający renderowanie aplikacji.
-
------------------------------------------------------------------------------------------------------
+---
 
 ## TC001 - Wyświetlanie pytania w trybie standardowym
 
@@ -197,78 +168,3 @@ npm test
 | **Oczekiwany rezultat** | Wyświetla ikonę uśmiechu, tekst "Na dzisiaj koniec!", "Wróć jutro ;)", przycisk "Wróć" |
 
 ---
-=======
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
->>>>>>> 8d763e573fdbd71622511f4fb50c75526feec3d9

@@ -2,7 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './app/router';
+<<<<<<< HEAD
 import '@ant-design/v5-patch-for-react-19';
+=======
+>>>>>>> 8d763e573fdbd71622511f4fb50c75526feec3d9
 import './index.css';
 import './i18n/config';
 
