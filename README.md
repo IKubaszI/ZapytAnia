@@ -41,7 +41,10 @@ Aby uruchomić wszystkie testy, użyj komendy:
 ```bash
 npm test
 ```
-
+W prypadku Windowsa 
+```
+cmd /c npm test
+```
 ### Struktura testów
 - `src/tests/features`: Testy integracyjne i jednostkowe dla funkcjonalności (Decks, Quiz, Stats).
 - `src/tests/services`: Testy serwisów (np. repozytoria).
